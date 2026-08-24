@@ -1,0 +1,75 @@
+{
+    "language": {
+        "ca": "Catalán",
+        "es": "Castellano"
+    },
+    "auth": {
+        "admin_login_title": "Acceso Administración / QC",
+        "email": "Correo electrónico",
+        "password": "Contraseña",
+        "submit": "Entrar",
+        "logout": "Cerrar sesión"
+    },
+    "operari": {
+        "login_title": "Acceso Operario",
+        "username": "Usuario"
+    },
+    "selector": {
+        "title": "Selecciona proyecto",
+        "project_number": "Número de proyecto",
+        "order_number": "Número de OF",
+        "serie_number": "Número de serie",
+        "start": "Iniciar comprobación",
+        "no_results": "Sin resultados",
+        "project_required": "Selecciona primero un proyecto",
+        "order_required": "Selecciona primero un número de OF"
+    },
+    "form": {
+        "global_observations": "Observaciones del proyecto",
+        "equipment_observations": "Observaciones",
+        "equipment_observations_placeholder": "Observaciones de este equipo (opcional)",
+        "yes": "Sí",
+        "no": "No",
+        "defect": "Defecto",
+        "save": "Guardar",
+        "finish": "Finalizar",
+        "saved": "Guardado",
+        "add_defect": "Añadir defecto"
+    },
+    "defect": {
+        "title": "Registrar defecto",
+        "type": "Tipo",
+        "observation": "Observación",
+        "responsibility": "Responsabilidad",
+        "actions": "Acciones",
+        "save": "Guardar defecto",
+        "add_another": "Añadir otro defecto",
+        "cancel": "Cancelar",
+        "type_visual": "Visual",
+        "type_dimensional": "Dimensional",
+        "type_funcional": "Funcional",
+        "responsibility_produccio": "Producción",
+        "responsibility_proveidor": "Proveedor",
+        "responsibility_disseny": "Diseño"
+    },
+    "photos": {
+        "title": "¿Quieres hacer fotos?",
+        "subtitle": "Puedes añadir entre 5 y 6 fotos (opcional)",
+        "add": "Añadir fotos",
+        "save": "Guardar y finalizar",
+        "skip": "Finalizar sin fotos"
+    },
+    "list": {
+        "title": "Números de serie",
+        "serie_number": "Número de serie",
+        "status": "Estado",
+        "defects": "Defectos",
+        "observations": "Observaciones"
+    },
+    "status": {
+        "pending": "Pendiente",
+        "ok": "Correcto",
+        "defect": "Con defectos",
+        "observation": "Con observaciones"
+    }
+}

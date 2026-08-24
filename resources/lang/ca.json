@@ -1,0 +1,75 @@
+{
+    "language": {
+        "ca": "Català",
+        "es": "Castellà"
+    },
+    "auth": {
+        "admin_login_title": "Accés Administració / QC",
+        "email": "Correu electrònic",
+        "password": "Contrasenya",
+        "submit": "Entrar",
+        "logout": "Tancar sessió"
+    },
+    "operari": {
+        "login_title": "Accés Operari",
+        "username": "Usuari"
+    },
+    "selector": {
+        "title": "Selecciona projecte",
+        "project_number": "Número de projecte",
+        "order_number": "Número d'OF",
+        "serie_number": "Número de sèrie",
+        "start": "Iniciar comprovació",
+        "no_results": "Sense resultats",
+        "project_required": "Selecciona primer un projecte",
+        "order_required": "Selecciona primer un número d'OF"
+    },
+    "form": {
+        "global_observations": "Observacions del projecte",
+        "equipment_observations": "Observacions",
+        "equipment_observations_placeholder": "Observacions d'aquest equipament (opcional)",
+        "yes": "Sí",
+        "no": "No",
+        "defect": "Defecte",
+        "save": "Desa",
+        "finish": "Finalitzar",
+        "saved": "Desat",
+        "add_defect": "Afegir defecte"
+    },
+    "defect": {
+        "title": "Registrar defecte",
+        "type": "Tipus",
+        "observation": "Observació",
+        "responsibility": "Responsabilitat",
+        "actions": "Accions",
+        "save": "Desa defecte",
+        "add_another": "Afegir un altre defecte",
+        "cancel": "Cancel·lar",
+        "type_visual": "Visual",
+        "type_dimensional": "Dimensional",
+        "type_funcional": "Funcional",
+        "responsibility_produccio": "Producció",
+        "responsibility_proveidor": "Proveïdor",
+        "responsibility_disseny": "Disseny"
+    },
+    "photos": {
+        "title": "Vols fer fotos?",
+        "subtitle": "Pots afegir entre 5 i 6 fotos (opcional)",
+        "add": "Afegir fotos",
+        "save": "Desa i finalitza",
+        "skip": "Finalitzar sense fotos"
+    },
+    "list": {
+        "title": "Números de sèrie",
+        "serie_number": "Número de sèrie",
+        "status": "Estat",
+        "defects": "Defectes",
+        "observations": "Observacions"
+    },
+    "status": {
+        "pending": "Pendent",
+        "ok": "Correcte",
+        "defect": "Amb defectes",
+        "observation": "Amb observacions"
+    }
+}

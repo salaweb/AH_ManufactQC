@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\EquipmentController;
+use App\Http\Controllers\Admin\OrderFabricationController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\SectionController;
@@ -10,3 +12,5 @@ Route::apiResource('projects', ProjectController::class);
 Route::apiResource('sections', SectionController::class);
 Route::apiResource('questions', QuestionController::class);
 Route::apiResource('users', UserController::class);
+Route::apiResource('order-fabrications', OrderFabricationController::class);
+Route::apiResource('equipment', EquipmentController::class);

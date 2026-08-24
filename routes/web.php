@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Operari\LoginController as OperariLoginController;
 use App\Http\Middleware\Admin\EnsureAdminOrQc;
 use App\Http\Middleware\Operari\EnsureOperari;
+use App\Models\Equipment;
+use App\Models\OrderFabrication;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -27,7 +29,20 @@ Route::get('/operari', function () {
     return Inertia::render('Operari/ProjectSelector');
 })->middleware(['auth', EnsureOperari::class])->name('operari.home');
 
+Route::get('/operari/order-fabrications/{orderFabrication}/equipment-list', function (OrderFabrication $orderFabrication) {
+    return Inertia::render('Operari/EquipmentList', ['orderFabricationId' => $orderFabrication->id]);
+})->middleware(['auth', EnsureOperari::class])->name('operari.equipment-list');
+
+Route::get('/operari/equipment/{equipment}/check', function (Equipment $equipment) {
+    return Inertia::render('Operari/FormCheck', ['equipmentId' => $equipment->id]);
+})->middleware(['auth', EnsureOperari::class])->name('operari.check');
+
 Route::middleware(['auth', EnsureAdminOrQc::class])
     ->prefix('api')
     ->name('api.')
     ->group(base_path('routes/api.php'));
+
+Route::middleware(['auth', EnsureOperari::class])
+    ->prefix('operari/api')
+    ->name('operari.api.')
+    ->group(base_path('routes/operari-api.php'));
