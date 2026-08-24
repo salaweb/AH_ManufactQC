@@ -71,5 +71,23 @@
         "ok": "Correcto",
         "defect": "Con defectos",
         "observation": "Con observaciones"
+    },
+    "dashboard": {
+        "title": "Dashboard Admin/QC",
+        "all_projects": "Todos los proyectos",
+        "date_to": "hasta",
+        "total_equipment": "Equipos totales",
+        "checked_equipment": "Equipos comprobados",
+        "completion_percentage": "% completado",
+        "total_defects": "Defectos totales",
+        "defects_by_type": "Defectos por tipo",
+        "responsibilities": "Responsabilidades",
+        "trends": "% defectos por sección",
+        "recent_photos": "Últimas fotos",
+        "no_data": "Sin datos",
+        "category": "Categoría",
+        "count": "Total",
+        "table_view": "Ver como tabla",
+        "chart_view": "Ver como gráfico"
     }
 }

@@ -71,5 +71,23 @@
         "ok": "Correcte",
         "defect": "Amb defectes",
         "observation": "Amb observacions"
+    },
+    "dashboard": {
+        "title": "Dashboard Admin/QC",
+        "all_projects": "Tots els projectes",
+        "date_to": "fins",
+        "total_equipment": "Equipaments totals",
+        "checked_equipment": "Equipaments comprovats",
+        "completion_percentage": "% completat",
+        "total_defects": "Defectes totals",
+        "defects_by_type": "Defectes per tipus",
+        "responsibilities": "Responsabilitats",
+        "trends": "% defectes per secció",
+        "recent_photos": "Últimes fotos",
+        "no_data": "Sense dades",
+        "category": "Categoria",
+        "count": "Total",
+        "table_view": "Veure com a taula",
+        "chart_view": "Veure com a gràfic"
     }
 }
