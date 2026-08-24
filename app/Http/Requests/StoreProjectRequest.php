@@ -28,6 +28,8 @@ class StoreProjectRequest extends FormRequest
             'family' => ['required', 'string'],
             'description' => ['nullable', 'string'],
             'observations' => ['nullable', 'string'],
+            'section_ids' => ['array'],
+            'section_ids.*' => ['integer', 'exists:sections,id'],
         ];
     }
 }

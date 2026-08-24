@@ -3,6 +3,7 @@ import { onMounted, reactive, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
+import OperariNav from '../../Components/OperariNav.vue';
 import ButtonGroup from '../../Components/ButtonGroup.vue';
 import DefectModal from './DefectModal.vue';
 import PhotosModal from './PhotosModal.vue';
@@ -87,6 +88,8 @@ onMounted(load);
 
     <div v-if="equipment" class="min-h-screen bg-gray-50 px-4 py-10">
         <div class="mx-auto max-w-xl space-y-6 rounded-lg bg-white p-6 shadow">
+            <OperariNav :back-href="`/operari/order-fabrications/${equipment.order_fabrication_id}/equipment-list`" />
+
             <div>
                 <h1 class="text-lg font-semibold text-gray-800">{{ project.description }}</h1>
                 <p v-if="project.observations" class="mt-1 text-sm text-gray-500">

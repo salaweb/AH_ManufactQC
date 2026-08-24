@@ -25,6 +25,10 @@ Route::get('/admin/dashboard', function () {
     return Inertia::render('Admin/Dashboard');
 })->middleware(['auth', EnsureAdminOrQc::class])->name('admin.dashboard');
 
+Route::get('/admin/projects', function () {
+    return Inertia::render('Admin/ProjectIndex');
+})->middleware(['auth', EnsureAdminOrQc::class])->name('admin.projects');
+
 Route::get('/operari', function () {
     return Inertia::render('Operari/ProjectSelector');
 })->middleware(['auth', EnsureOperari::class])->name('operari.home');

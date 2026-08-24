@@ -29,7 +29,7 @@ class EquipmentController extends Controller
 
         $answers = $equipment->answers()->get()->keyBy('question_id');
 
-        $sections = Section::query()
+        $sections = $equipment->project->sections()
             ->with(['questions' => fn ($query) => $query->orderBy('order')])
             ->orderBy('order')
             ->get()

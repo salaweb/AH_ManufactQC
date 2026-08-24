@@ -33,6 +33,7 @@ it('lists equipment for an order fabrication, alongside the OF and its project',
 it('shows equipment with sections, questions and existing answers', function () {
     $equipment = Equipment::factory()->create();
     $section = Section::factory()->create(['order' => 1]);
+    $equipment->project->sections()->attach($section);
     $question = Question::factory()->create(['section_id' => $section->id, 'order' => 1]);
     Answer::factory()->create([
         'equipment_id' => $equipment->id,
@@ -47,6 +48,20 @@ it('shows equipment with sections, questions and existing answers', function () 
 
     expect($payload['equipment']['id'])->toBe($equipment->id)
         ->and($payload['sections'][0]['questions'][0]['answer']['response'])->toBe('yes');
+});
+
+it('only shows sections assigned to the equipment\'s project, not every section in the system', function () {
+    $equipment = Equipment::factory()->create();
+    $assignedSection = Section::factory()->create(['name' => 'ASSIGNED']);
+    $otherSection = Section::factory()->create(['name' => 'NOT_ASSIGNED']);
+    $equipment->project->sections()->attach($assignedSection);
+
+    $response = $this->getJson("/operari/api/equipment/{$equipment->id}");
+
+    $sectionNames = collect($response->json('sections'))->pluck('name');
+
+    expect($sectionNames)->toContain('ASSIGNED')
+        ->not->toContain('NOT_ASSIGNED');
 });
 
 it('saves equipment observations progressively', function () {

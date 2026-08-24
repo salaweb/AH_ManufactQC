@@ -11,6 +11,7 @@ vi.mock('@inertiajs/vue3', () => ({
         processing: false,
         post: postMock,
     }),
+    Link: { template: '<a><slot /></a>' },
 }));
 
 const { default: Login } = await import('../../../Pages/Operari/Login.vue');

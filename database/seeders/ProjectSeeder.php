@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Equipment;
 use App\Models\OrderFabrication;
 use App\Models\Project;
+use App\Models\Section;
 use Illuminate\Database\Seeder;
 
 class ProjectSeeder extends Seeder
@@ -14,10 +15,16 @@ class ProjectSeeder extends Seeder
      */
     public function run(): void
     {
+        $qualitat = Section::where('name', 'QUALITAT')->first();
+
         Project::factory()
             ->count(3)
             ->create()
-            ->each(function (Project $project) {
+            ->each(function (Project $project) use ($qualitat) {
+                if ($qualitat) {
+                    $project->sections()->attach($qualitat);
+                }
+
                 OrderFabrication::factory()
                     ->count(2)
                     ->for($project)

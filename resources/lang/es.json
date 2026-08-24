@@ -3,6 +3,9 @@
         "ca": "Catalán",
         "es": "Castellano"
     },
+    "common": {
+        "back": "Atrás"
+    },
     "auth": {
         "admin_login_title": "Acceso Administración / QC",
         "email": "Correo electrónico",
@@ -84,5 +87,20 @@
         "count": "Total",
         "table_view": "Ver como tabla",
         "chart_view": "Ver como gráfico"
+    },
+    "admin_projects": {
+        "title": "Proyectos",
+        "number": "Número",
+        "family": "Familia",
+        "description": "Descripción",
+        "observations": "Observaciones",
+        "sections": "Secciones",
+        "add": "Añadir proyecto",
+        "edit": "Editar proyecto",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "delete_confirm": "¿Seguro que quieres eliminar este proyecto? También se eliminarán sus OF y equipos.",
+        "no_sections": "Sin secciones"
     }
 }

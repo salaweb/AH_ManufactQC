@@ -3,6 +3,7 @@ import { ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
+import OperariNav from '../../Components/OperariNav.vue';
 import { api } from '../../api';
 
 const { t } = useI18n();
@@ -38,6 +39,8 @@ function selectOrderFabrication(orderFabrication) {
 
     <div class="min-h-screen bg-gray-50 px-4 py-10">
         <div class="mx-auto max-w-md space-y-4 rounded-lg bg-white p-6 shadow">
+            <OperariNav />
+
             <h1 class="text-lg font-semibold text-gray-800">{{ t('selector.title') }}</h1>
 
             <div class="relative">

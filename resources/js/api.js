@@ -38,6 +38,8 @@ async function request(url, options = {}) {
 export const api = {
     get: (url) => request(url, { method: 'GET' }),
     post: (url, json) => request(url, { method: 'POST', json }),
+    put: (url, json) => request(url, { method: 'PUT', json }),
     patch: (url, json) => request(url, { method: 'PATCH', json }),
+    delete: (url) => request(url, { method: 'DELETE' }),
     postForm: (url, formData) => request(url, { method: 'POST', body: formData }),
 };

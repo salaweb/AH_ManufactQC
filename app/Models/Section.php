@@ -6,6 +6,7 @@ use Database\Factories\SectionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['name', 'description', 'order'])]
@@ -17,5 +18,10 @@ class Section extends Model
     public function questions(): HasMany
     {
         return $this->hasMany(Question::class)->orderBy('order');
+    }
+
+    public function projects(): BelongsToMany
+    {
+        return $this->belongsToMany(Project::class);
     }
 }

@@ -93,3 +93,16 @@ it('relates Defect to its originating Answer, nullable', function () {
     expect($defectWithAnswer->answer)->not->toBeNull()
         ->and($defectWithoutAnswer->answer)->toBeNull();
 });
+
+it('relates Project and Section many-to-many, a project only using a subset of the available sections', function () {
+    $project = Project::factory()->create();
+    $usedSection = Section::factory()->create();
+    $unusedSection = Section::factory()->create();
+
+    $project->sections()->attach($usedSection);
+
+    expect($project->sections)->toHaveCount(1)
+        ->and($project->sections->first()->is($usedSection))->toBeTrue()
+        ->and($usedSection->projects->first()->is($project))->toBeTrue()
+        ->and($unusedSection->projects)->toHaveCount(0);
+});

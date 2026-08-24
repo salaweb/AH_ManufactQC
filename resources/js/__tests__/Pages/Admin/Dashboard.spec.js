@@ -12,6 +12,7 @@ vi.mock('../../../api', () => ({
 
 vi.mock('@inertiajs/vue3', () => ({
     router: { post: vi.fn() },
+    Link: { template: '<a><slot /></a>' },
 }));
 
 const { default: Dashboard } = await import('../../../Pages/Admin/Dashboard.vue');

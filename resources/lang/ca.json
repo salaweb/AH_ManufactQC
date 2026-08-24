@@ -3,6 +3,9 @@
         "ca": "Català",
         "es": "Castellà"
     },
+    "common": {
+        "back": "Enrere"
+    },
     "auth": {
         "admin_login_title": "Accés Administració / QC",
         "email": "Correu electrònic",
@@ -84,5 +87,20 @@
         "count": "Total",
         "table_view": "Veure com a taula",
         "chart_view": "Veure com a gràfic"
+    },
+    "admin_projects": {
+        "title": "Projectes",
+        "number": "Número",
+        "family": "Família",
+        "description": "Descripció",
+        "observations": "Observacions",
+        "sections": "Seccions",
+        "add": "Afegir projecte",
+        "edit": "Editar projecte",
+        "save": "Desa",
+        "cancel": "Cancel·lar",
+        "delete": "Eliminar",
+        "delete_confirm": "Segur que vols eliminar aquest projecte? També s'eliminaran les seves OF i equipaments.",
+        "no_sections": "Sense seccions"
     }
 }

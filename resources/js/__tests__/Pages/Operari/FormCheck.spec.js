@@ -15,7 +15,8 @@ vi.mock('../../../api', () => ({
 }));
 
 vi.mock('@inertiajs/vue3', () => ({
-    router: { visit: vi.fn() },
+    router: { visit: vi.fn(), post: vi.fn() },
+    Link: { template: '<a><slot /></a>' },
 }));
 
 const { default: FormCheck } = await import('../../../Pages/Operari/FormCheck.vue');

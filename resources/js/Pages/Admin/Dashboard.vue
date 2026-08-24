@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
 import StatCard from '../../Components/StatCard.vue';
@@ -69,9 +69,14 @@ onMounted(() => {
         <div class="mx-auto max-w-4xl space-y-6">
             <div class="flex items-center justify-between">
                 <h1 class="text-lg font-semibold text-gray-800">{{ t('dashboard.title') }}</h1>
-                <button type="button" class="text-sm text-gray-500" @click="logout">
-                    {{ t('auth.logout') }}
-                </button>
+                <div class="flex items-center gap-4">
+                    <Link href="/admin/projects" class="text-sm text-gray-500 hover:text-gray-700">
+                        {{ t('admin_projects.title') }}
+                    </Link>
+                    <button type="button" class="text-sm text-gray-500" @click="logout">
+                        {{ t('auth.logout') }}
+                    </button>
+                </div>
             </div>
 
             <FilterBar v-model="filters" :projects="projects" />

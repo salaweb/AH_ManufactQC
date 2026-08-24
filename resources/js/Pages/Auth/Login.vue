@@ -1,5 +1,5 @@
 <script setup>
-import { useForm } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
 import FormField from '../../Components/FormField.vue';
@@ -21,6 +21,8 @@ function submit() {
 
     <div class="flex min-h-screen items-center justify-center bg-gray-50 px-4">
         <form class="w-full max-w-sm space-y-4 rounded-lg bg-white p-6 shadow" @submit.prevent="submit">
+            <Link href="/" class="text-sm text-gray-500 hover:text-gray-700">← {{ t('common.back') }}</Link>
+
             <h1 class="text-lg font-semibold text-gray-800">{{ t('auth.admin_login_title') }}</h1>
 
             <FormField

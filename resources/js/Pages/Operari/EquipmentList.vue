@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
+import OperariNav from '../../Components/OperariNav.vue';
 import { api } from '../../api';
 
 const props = defineProps({
@@ -39,6 +40,8 @@ onMounted(load);
 
     <div class="min-h-screen bg-gray-50 px-4 py-10">
         <div class="mx-auto max-w-2xl space-y-4 rounded-lg bg-white p-6 shadow">
+            <OperariNav back-href="/operari" />
+
             <div v-if="orderFabrication">
                 <h1 class="text-lg font-semibold text-gray-800">
                     {{ orderFabrication.project.number }} — {{ orderFabrication.project.family }}

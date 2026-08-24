@@ -13,26 +13,36 @@ class ProjectController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(Project::orderBy('number')->get());
+        return response()->json(Project::with('sections')->orderBy('number')->get());
     }
 
     public function store(StoreProjectRequest $request): JsonResponse
     {
-        $project = Project::create($request->validated());
+        $data = $request->validated();
+        $sectionIds = $data['section_ids'] ?? [];
+        unset($data['section_ids']);
 
-        return response()->json($project, 201);
+        $project = Project::create($data);
+        $project->sections()->sync($sectionIds);
+
+        return response()->json($project->load('sections'), 201);
     }
 
     public function show(Project $project): JsonResponse
     {
-        return response()->json($project);
+        return response()->json($project->load('sections'));
     }
 
     public function update(UpdateProjectRequest $request, Project $project): JsonResponse
     {
-        $project->update($request->validated());
+        $data = $request->validated();
+        $sectionIds = $data['section_ids'] ?? [];
+        unset($data['section_ids']);
 
-        return response()->json($project);
+        $project->update($data);
+        $project->sections()->sync($sectionIds);
+
+        return response()->json($project->load('sections'));
     }
 
     public function destroy(Project $project): Response
