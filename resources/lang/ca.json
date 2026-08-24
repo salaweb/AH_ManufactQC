@@ -15,14 +15,9 @@
         "username": "Usuari"
     },
     "selector": {
-        "title": "Selecciona projecte",
-        "project_number": "Número de projecte",
+        "title": "Cerca l'OF",
         "order_number": "Número d'OF",
-        "serie_number": "Número de sèrie",
-        "start": "Iniciar comprovació",
-        "no_results": "Sense resultats",
-        "project_required": "Selecciona primer un projecte",
-        "order_required": "Selecciona primer un número d'OF"
+        "no_results": "Sense resultats"
     },
     "form": {
         "global_observations": "Observacions del projecte",

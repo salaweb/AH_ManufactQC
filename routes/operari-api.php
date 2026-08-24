@@ -3,12 +3,10 @@
 use App\Http\Controllers\Operari\AnswerController;
 use App\Http\Controllers\Operari\DefectController;
 use App\Http\Controllers\Operari\EquipmentController;
-use App\Http\Controllers\Operari\ProjectController;
+use App\Http\Controllers\Operari\OrderFabricationController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/projects', [ProjectController::class, 'index']);
-Route::get('/projects/{project}/order-fabrications', [ProjectController::class, 'orderFabrications']);
-
+Route::get('/order-fabrications', [OrderFabricationController::class, 'index']);
 Route::get('/order-fabrications/{orderFabrication}/equipment', [EquipmentController::class, 'index']);
 Route::get('/equipment/{equipment}', [EquipmentController::class, 'show']);
 Route::patch('/equipment/{equipment}', [EquipmentController::class, 'update']);

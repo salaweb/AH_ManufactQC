@@ -17,9 +17,10 @@ class EquipmentController extends Controller
 {
     public function index(OrderFabrication $orderFabrication): JsonResponse
     {
-        return response()->json(
-            $orderFabrication->equipment()->withCount('defects')->orderBy('serie_number')->get()
-        );
+        return response()->json([
+            'order_fabrication' => $orderFabrication->load('project'),
+            'equipment' => $orderFabrication->equipment()->withCount('defects')->orderBy('serie_number')->get(),
+        ]);
     }
 
     public function show(Equipment $equipment): JsonResponse

@@ -14,10 +14,8 @@ return new class extends Migration
         Schema::create('order_fabrications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_id')->constrained()->cascadeOnDelete();
-            $table->string('number');
+            $table->string('number')->unique();
             $table->timestamps();
-
-            $table->unique(['project_id', 'number']);
         });
     }
 

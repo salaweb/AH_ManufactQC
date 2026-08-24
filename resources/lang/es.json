@@ -15,14 +15,9 @@
         "username": "Usuario"
     },
     "selector": {
-        "title": "Selecciona proyecto",
-        "project_number": "Número de proyecto",
+        "title": "Busca la OF",
         "order_number": "Número de OF",
-        "serie_number": "Número de serie",
-        "start": "Iniciar comprobación",
-        "no_results": "Sin resultados",
-        "project_required": "Selecciona primero un proyecto",
-        "order_required": "Selecciona primero un número de OF"
+        "no_results": "Sin resultados"
     },
     "form": {
         "global_observations": "Observaciones del proyecto",

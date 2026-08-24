@@ -27,9 +27,7 @@ class UpdateOrderFabricationRequest extends FormRequest
             'project_id' => ['required', 'integer', 'exists:projects,id'],
             'number' => [
                 'required', 'string',
-                Rule::unique('order_fabrications')
-                    ->where('project_id', $this->input('project_id'))
-                    ->ignore($this->route('order_fabrication')),
+                Rule::unique('order_fabrications', 'number')->ignore($this->route('order_fabrication')),
             ],
         ];
     }

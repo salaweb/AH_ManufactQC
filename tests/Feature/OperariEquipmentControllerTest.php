@@ -16,7 +16,7 @@ beforeEach(function () {
     $this->actingAs(User::factory()->operari()->create());
 });
 
-it('lists equipment for an order fabrication', function () {
+it('lists equipment for an order fabrication, alongside the OF and its project', function () {
     $orderFabrication = OrderFabrication::factory()->create();
     Equipment::factory()->count(3)->create([
         'project_id' => $orderFabrication->project_id,
@@ -25,7 +25,9 @@ it('lists equipment for an order fabrication', function () {
 
     $response = $this->getJson("/operari/api/order-fabrications/{$orderFabrication->id}/equipment");
 
-    $response->assertOk()->assertJsonCount(3);
+    $response->assertOk()->assertJsonCount(3, 'equipment');
+    expect($response->json('order_fabrication.id'))->toBe($orderFabrication->id)
+        ->and($response->json('order_fabrication.project.id'))->toBe($orderFabrication->project_id);
 });
 
 it('shows equipment with sections, questions and existing answers', function () {

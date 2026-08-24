@@ -32,7 +32,7 @@ it('rejects a duplicate OF number within the same project', function () {
     $response->assertUnprocessable()->assertJsonValidationErrors('number');
 });
 
-it('allows the same OF number in a different project', function () {
+it('rejects a duplicate OF number even across different projects, since OF numbers are globally unique', function () {
     OrderFabrication::factory()->create(['number' => 'OF-1001']);
     $otherProject = Project::factory()->create();
 
@@ -41,7 +41,7 @@ it('allows the same OF number in a different project', function () {
         'number' => 'OF-1001',
     ]);
 
-    $response->assertCreated();
+    $response->assertUnprocessable()->assertJsonValidationErrors('number');
 });
 
 it('lists order fabrications filtered by project', function () {

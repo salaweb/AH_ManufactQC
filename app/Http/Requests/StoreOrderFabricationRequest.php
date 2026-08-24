@@ -25,10 +25,7 @@ class StoreOrderFabricationRequest extends FormRequest
     {
         return [
             'project_id' => ['required', 'integer', 'exists:projects,id'],
-            'number' => [
-                'required', 'string',
-                Rule::unique('order_fabrications')->where('project_id', $this->input('project_id')),
-            ],
+            'number' => ['required', 'string', Rule::unique('order_fabrications', 'number')],
         ];
     }
 }

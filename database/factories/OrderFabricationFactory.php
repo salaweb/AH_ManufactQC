@@ -20,7 +20,7 @@ class OrderFabricationFactory extends Factory
     {
         return [
             'project_id' => Project::factory(),
-            'number' => 'OF-'.$this->faker->unique()->numerify('#####'),
+            'number' => $this->faker->unique()->numerify(now()->format('Y').'/##/#######'),
         ];
     }
 }
