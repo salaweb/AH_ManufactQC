@@ -26,3 +26,8 @@ Route::get('/admin/dashboard', function () {
 Route::get('/operari', function () {
     return Inertia::render('Operari/ProjectSelector');
 })->middleware(['auth', EnsureOperari::class])->name('operari.home');
+
+Route::middleware(['auth', EnsureAdminOrQc::class])
+    ->prefix('api')
+    ->name('api.')
+    ->group(base_path('routes/api.php'));
