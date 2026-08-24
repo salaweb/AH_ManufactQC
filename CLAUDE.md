@@ -57,9 +57,11 @@ Never implement or run code without explicit approval. Procedure for every unit 
 ```
 app/Models/                    Eloquent models
 app/Http/Controllers/          Admin/ and Operari/ subfolders
-app/Http/Middleware/           Admin/ and Web/ subfolders for role-guard middleware (e.g. Fase 2's
-                                EnsureUserRole variants); Inertia's own HandleInertiaRequests stays
-                                directly under Middleware/ since it's global, not role-specific
+app/Http/Middleware/           Admin/ and Operari/ subfolders for role-guard middleware (e.g. Fase 2's
+                                EnsureAdminOrQc / EnsureOperari); NOT "Web/" — that collides with
+                                Laravel's own built-in "web" middleware group name, which is a
+                                different thing. Inertia's own HandleInertiaRequests stays directly
+                                under Middleware/ since it's global, not role-specific
 app/Http/Requests/             Form Requests (all validation)
 database/migrations/
 database/factories/
@@ -90,7 +92,7 @@ storage/app/photos/            Uploaded equipment photos
 Work proceeds strictly in this order; each phase needs its own tests passing and explicit user go-ahead before starting the next.
 
 1. **Setup Inicial** — DONE. Models, migrations, factories, seeders (User, Project, Section, Question, OrderFabrication, Equipment, Answer, Defect, Photo), base Pest tests (`DatabaseSeederTest`, `ModelRelationshipsTest`).
-2. **Autenticació multi-rol** — DONE. `Admin\EnsureAdminOrQc` + `Web\EnsureOperari` middleware, `AuthController` (Admin/QC, email) + `Operari\LoginController` (username), `LoginRequest`/`OperariLoginRequest`, `AuthenticationTest`, `AuthorizationTest`. Also created bare placeholder pages `Auth/Login.vue`, `Operari/Login.vue`, `Admin/Dashboard.vue`, `Operari/ProjectSelector.vue` — functional but unstyled/no i18n, since real UI is Fase 4/5 scope; don't be surprised they already exist when starting those phases, just style/wire them properly instead of recreating.
+2. **Autenticació multi-rol** — DONE. `Admin\EnsureAdminOrQc` + `Operari\EnsureOperari` middleware, `AuthController` (Admin/QC, email) + `Operari\LoginController` (username), `LoginRequest`/`OperariLoginRequest`, `AuthenticationTest`, `AuthorizationTest`. Also created bare placeholder pages `Auth/Login.vue`, `Operari/Login.vue`, `Admin/Dashboard.vue`, `Operari/ProjectSelector.vue` — functional but unstyled/no i18n, since real UI is Fase 4/5 scope; don't be surprised they already exist when starting those phases, just style/wire them properly instead of recreating.
 3. **Backend CRUD (Admin/QC)** — Controllers + Form Requests for Project/Section/Question/User, `/api/*` routes, one Pest test file per controller.
 4. **Frontend Operari** — Flesh out `Operari/Login.vue` and `Operari/ProjectSelector.vue` (already exist as bare placeholders from Fase 2) plus FormCheck, DefectModal, PhotosModal, EquipmentList Vue pages; LanguageSelector/FormField/ButtonGroup components; i18n setup; Vitest specs.
 5. **Dashboard QC + i18n complet** — DashboardController + stats/defects/responsibilities/trends endpoints, Admin/Dashboard.vue + chart/stat components, full ca/es translation coverage, Pest + Vitest tests.

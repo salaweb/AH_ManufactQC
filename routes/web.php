@@ -3,7 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Operari\LoginController as OperariLoginController;
 use App\Http\Middleware\Admin\EnsureAdminOrQc;
-use App\Http\Middleware\Web\EnsureOperari;
+use App\Http\Middleware\Operari\EnsureOperari;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 

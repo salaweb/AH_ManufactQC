@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Middleware\Web;
+namespace App\Http\Middleware\Operari;
 
 use App\Enums\UserRole;
 use Closure;
