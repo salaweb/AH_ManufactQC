@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-Scaffolding is done: Laravel + Inertia + Vue 3 + Tailwind + Pest + Vitest are installed and wired together (verified with `npm run build` and `./vendor/bin/pest`). No domain code yet — Fase 1 (Setup Inicial: models, migrations, factories, seeders) has not started. Implementation proceeds in the 5 phases listed below; do not jump ahead to a later phase until the user has explicitly approved moving on from the current one.
+Fase 1 (models/migrations/factories/seeders) and Fase 2 (multi-role auth) are done — 24/24 Pest tests passing. Fase 3 (Backend CRUD Admin/QC) has not started. Implementation proceeds in the 5 phases listed below; do not jump ahead to a later phase until the user has explicitly approved moving on from the current one.
+
+Auth design actually implemented in Fase 2 (for reference, since it refines what the phase list below only sketches): a single `web` guard against the `users` table serves both login forms — Admin/QC via `email`, Operari via `username` — because a user only ever has one of the two set, so `Auth::attempt()` naturally can't cross-match; each controller still re-checks `role` after a successful attempt as defense in depth. Guests are redirected to the login form matching the area they hit (`operari.login` for `/operari*`, `login` otherwise) via `redirectGuestsTo` in `bootstrap/app.php`.
 
 ## Project overview
 
@@ -87,10 +89,10 @@ storage/app/photos/            Uploaded equipment photos
 
 Work proceeds strictly in this order; each phase needs its own tests passing and explicit user go-ahead before starting the next.
 
-1. **Setup Inicial** — Models, migrations, factories, seeders (User, Project, Section, Question, OrderFabrication, Equipment, Answer, Defect, Photo), base Pest tests (`DatabaseSeederTest`, `ModelRelationshipsTest`).
-2. **Autenticació multi-rol** — `EnsureUserRole` middleware (split into `Admin/` and `Web/`, see folder structure above), Admin/QC login (email) vs Operari login (username) routes/controllers/requests, `AuthenticationTest`, `AuthorizationTest`.
+1. **Setup Inicial** — DONE. Models, migrations, factories, seeders (User, Project, Section, Question, OrderFabrication, Equipment, Answer, Defect, Photo), base Pest tests (`DatabaseSeederTest`, `ModelRelationshipsTest`).
+2. **Autenticació multi-rol** — DONE. `Admin\EnsureAdminOrQc` + `Web\EnsureOperari` middleware, `AuthController` (Admin/QC, email) + `Operari\LoginController` (username), `LoginRequest`/`OperariLoginRequest`, `AuthenticationTest`, `AuthorizationTest`. Also created bare placeholder pages `Auth/Login.vue`, `Operari/Login.vue`, `Admin/Dashboard.vue`, `Operari/ProjectSelector.vue` — functional but unstyled/no i18n, since real UI is Fase 4/5 scope; don't be surprised they already exist when starting those phases, just style/wire them properly instead of recreating.
 3. **Backend CRUD (Admin/QC)** — Controllers + Form Requests for Project/Section/Question/User, `/api/*` routes, one Pest test file per controller.
-4. **Frontend Operari** — Login, ProjectSelector, FormCheck, DefectModal, PhotosModal, EquipmentList Vue pages; LanguageSelector/FormField/ButtonGroup components; i18n setup; Vitest specs.
+4. **Frontend Operari** — Flesh out `Operari/Login.vue` and `Operari/ProjectSelector.vue` (already exist as bare placeholders from Fase 2) plus FormCheck, DefectModal, PhotosModal, EquipmentList Vue pages; LanguageSelector/FormField/ButtonGroup components; i18n setup; Vitest specs.
 5. **Dashboard QC + i18n complet** — DashboardController + stats/defects/responsibilities/trends endpoints, Admin/Dashboard.vue + chart/stat components, full ca/es translation coverage, Pest + Vitest tests.
 
 ## Commands
