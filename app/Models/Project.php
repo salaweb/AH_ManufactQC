@@ -6,10 +6,11 @@ use Database\Factories\ProjectFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['number', 'family', 'description', 'observations'])]
+#[Fillable(['number', 'family_id', 'observations'])]
 class Project extends Model
 {
     /** @use HasFactory<ProjectFactory> */
@@ -28,5 +29,17 @@ class Project extends Model
     public function sections(): BelongsToMany
     {
         return $this->belongsToMany(Section::class);
+    }
+
+    public function family(): BelongsTo
+    {
+        return $this->belongsTo(Family::class);
+    }
+
+    public function descriptionTags(): BelongsToMany
+    {
+        return $this->belongsToMany(DescriptionTag::class, 'project_description_tag')
+            ->withPivot('order')
+            ->orderByPivot('order');
     }
 }

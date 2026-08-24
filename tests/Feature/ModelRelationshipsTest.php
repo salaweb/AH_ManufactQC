@@ -4,7 +4,9 @@ use App\Enums\AnswerResponse;
 use App\Enums\EquipmentStatus;
 use App\Models\Answer;
 use App\Models\Defect;
+use App\Models\DescriptionTag;
 use App\Models\Equipment;
+use App\Models\Family;
 use App\Models\OrderFabrication;
 use App\Models\Photo;
 use App\Models\Project;
@@ -105,4 +107,18 @@ it('relates Project and Section many-to-many, a project only using a subset of t
         ->and($project->sections->first()->is($usedSection))->toBeTrue()
         ->and($usedSection->projects->first()->is($project))->toBeTrue()
         ->and($unusedSection->projects)->toHaveCount(0);
+});
+
+it('relates Project to a single Family and to many DescriptionTags', function () {
+    $family = Family::factory()->create(['name' => 'DB2']);
+    $project = Project::factory()->create(['family_id' => $family->id]);
+    $tagA = DescriptionTag::factory()->create();
+    $tagB = DescriptionTag::factory()->create();
+
+    $project->descriptionTags()->attach([$tagA->id, $tagB->id]);
+
+    expect($project->family->is($family))->toBeTrue()
+        ->and($family->projects->first()->is($project))->toBeTrue()
+        ->and($project->descriptionTags)->toHaveCount(2)
+        ->and($tagA->projects->first()->is($project))->toBeTrue();
 });

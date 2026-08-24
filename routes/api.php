@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DescriptionTagController;
 use App\Http\Controllers\Admin\EquipmentController;
+use App\Http\Controllers\Admin\FamilyController;
 use App\Http\Controllers\Admin\OrderFabricationController;
 use App\Http\Controllers\Admin\PhotoController;
 use App\Http\Controllers\Admin\ProjectController;
@@ -16,6 +18,8 @@ Route::apiResource('questions', QuestionController::class);
 Route::apiResource('users', UserController::class);
 Route::apiResource('order-fabrications', OrderFabricationController::class);
 Route::apiResource('equipment', EquipmentController::class);
+Route::apiResource('families', FamilyController::class)->only(['index', 'store', 'destroy']);
+Route::apiResource('description-tags', DescriptionTagController::class)->only(['index', 'store', 'destroy']);
 
 Route::get('dashboard', [DashboardController::class, 'index']);
 Route::get('photos/{photo}', [PhotoController::class, 'show']);

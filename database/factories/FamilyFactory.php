@@ -3,13 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\Family;
-use App\Models\Project;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Project>
+ * @extends Factory<Family>
  */
-class ProjectFactory extends Factory
+class FamilyFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,9 +18,7 @@ class ProjectFactory extends Factory
     public function definition(): array
     {
         return [
-            'number' => $this->faker->unique()->numerify('1400C####.00'),
-            'family_id' => Family::factory(),
-            'observations' => $this->faker->optional()->paragraph(),
+            'name' => $this->faker->unique()->bothify('FAM-????'),
         ];
     }
 }

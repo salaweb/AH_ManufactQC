@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\DescriptionTag;
 use App\Models\Equipment;
+use App\Models\Family;
 use App\Models\OrderFabrication;
 use App\Models\Project;
 use App\Models\Section;
@@ -16,13 +18,20 @@ class ProjectSeeder extends Seeder
     public function run(): void
     {
         $qualitat = Section::where('name', 'QUALITAT')->first();
+        $families = Family::all();
+        $tags = DescriptionTag::all();
 
         Project::factory()
             ->count(3)
+            ->when($families->isNotEmpty(), fn ($factory) => $factory->state(fn () => ['family_id' => $families->random()->id]))
             ->create()
-            ->each(function (Project $project) use ($qualitat) {
+            ->each(function (Project $project) use ($qualitat, $tags) {
                 if ($qualitat) {
                     $project->sections()->attach($qualitat);
+                }
+
+                if ($tags->isNotEmpty()) {
+                    $project->descriptionTags()->attach($tags->random(min(2, $tags->count()))->pluck('id'));
                 }
 
                 OrderFabrication::factory()

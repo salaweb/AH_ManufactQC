@@ -25,11 +25,12 @@ class UpdateProjectRequest extends FormRequest
     {
         return [
             'number' => ['required', 'string', Rule::unique('projects', 'number')->ignore($this->route('project'))],
-            'family' => ['required', 'string'],
-            'description' => ['nullable', 'string'],
+            'family_id' => ['required', 'integer', 'exists:families,id'],
             'observations' => ['nullable', 'string'],
             'section_ids' => ['array'],
             'section_ids.*' => ['integer', 'exists:sections,id'],
+            'description_tag_ids' => ['array'],
+            'description_tag_ids.*' => ['integer', 'exists:description_tags,id'],
         ];
     }
 }

@@ -101,6 +101,10 @@
         "cancel": "Cancel·lar",
         "delete": "Eliminar",
         "delete_confirm": "Segur que vols eliminar aquest projecte? També s'eliminaran les seves OF i equipaments.",
-        "no_sections": "Sense seccions"
+        "no_sections": "Sense seccions",
+        "new_family": "Nova família…",
+        "new_tag": "Nova paraula de descripció…",
+        "search_tag": "Cerca una paraula per afegir-la…",
+        "add_failed": "No s'ha pogut afegir"
     }
 }

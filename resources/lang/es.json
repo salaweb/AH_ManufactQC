@@ -101,6 +101,10 @@
         "cancel": "Cancelar",
         "delete": "Eliminar",
         "delete_confirm": "¿Seguro que quieres eliminar este proyecto? También se eliminarán sus OF y equipos.",
-        "no_sections": "Sin secciones"
+        "no_sections": "Sin secciones",
+        "new_family": "Nueva familia…",
+        "new_tag": "Nueva palabra de descripción…",
+        "search_tag": "Busca una palabra para añadirla…",
+        "add_failed": "No se ha podido añadir"
     }
 }
