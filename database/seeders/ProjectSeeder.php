@@ -2,11 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\DescriptionTag;
+use App\Enums\QuestionCategory;
 use App\Models\Equipment;
 use App\Models\Family;
 use App\Models\OrderFabrication;
 use App\Models\Project;
+use App\Models\Question;
 use App\Models\Section;
 use Illuminate\Database\Seeder;
 
@@ -18,21 +19,22 @@ class ProjectSeeder extends Seeder
     public function run(): void
     {
         $qualitat = Section::where('name', 'QUALITAT')->first();
+        $componentSections = $this->componentSections();
         $families = Family::all();
-        $tags = DescriptionTag::all();
 
         Project::factory()
             ->count(3)
             ->when($families->isNotEmpty(), fn ($factory) => $factory->state(fn () => ['family_id' => $families->random()->id]))
             ->create()
-            ->each(function (Project $project) use ($qualitat, $tags) {
+            ->each(function (Project $project) use ($qualitat, $componentSections) {
+                $selected = $componentSections->random(min(2, $componentSections->count()))->values();
                 if ($qualitat) {
-                    $project->sections()->attach($qualitat);
+                    $selected->push($qualitat);
                 }
 
-                if ($tags->isNotEmpty()) {
-                    $project->descriptionTags()->attach($tags->random(min(2, $tags->count()))->pluck('id'));
-                }
+                $selected->each(function (Section $section, int $index) use ($project) {
+                    $project->sections()->attach($section->id, ['order' => $index]);
+                });
 
                 OrderFabrication::factory()
                     ->count(2)
@@ -47,5 +49,35 @@ class ProjectSeeder extends Seeder
                             ]);
                     });
             });
+    }
+
+    /**
+     * Real component-code sections the user named, each a lightweight section
+     * with a couple of categorized questions (demo depth, not exhaustive).
+     */
+    private function componentSections()
+    {
+        $names = ['AH17DX2', 'AH22DX2', 'TS', 'USB'];
+
+        return collect($names)->map(function (string $name) {
+            $section = Section::firstOrCreate(['name' => $name], ['description' => null, 'order' => 10]);
+
+            if ($section->questions()->count() === 0) {
+                Question::factory()->create([
+                    'section_id' => $section->id,
+                    'text' => "L'acabat de {$name} és correcte?",
+                    'category' => QuestionCategory::Estetica,
+                    'order' => 1,
+                ]);
+                Question::factory()->create([
+                    'section_id' => $section->id,
+                    'text' => "El muntatge de {$name} és correcte?",
+                    'category' => QuestionCategory::FuncionalMecanica,
+                    'order' => 2,
+                ]);
+            }
+
+            return $section;
+        });
     }
 }

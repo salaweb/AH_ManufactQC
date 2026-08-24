@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\QuestionCategory;
 use App\Models\Question;
 use App\Models\Section;
 use App\Models\User;
@@ -8,18 +9,32 @@ beforeEach(function () {
     $this->actingAs(User::factory()->admin()->create());
 });
 
-it('creates a question tied to a section', function () {
+it('creates a question tied to a section, with a category', function () {
     $section = Section::factory()->create();
 
     $response = $this->postJson('/api/questions', [
         'section_id' => $section->id,
         'text' => 'Acabat correcte?',
+        'category' => QuestionCategory::Estetica->value,
         'order' => 1,
         'is_required' => true,
     ]);
 
     $response->assertCreated();
-    expect(Question::where('section_id', $section->id)->exists())->toBeTrue();
+    $question = Question::where('section_id', $section->id)->first();
+    expect($question)->not->toBeNull()
+        ->and($question->category)->toBe(QuestionCategory::Estetica);
+});
+
+it('rejects creating a question without a category', function () {
+    $section = Section::factory()->create();
+
+    $response = $this->postJson('/api/questions', [
+        'section_id' => $section->id,
+        'text' => 'Acabat correcte?',
+    ]);
+
+    $response->assertUnprocessable()->assertJsonValidationErrors('category');
 });
 
 it('rejects creating a question without a valid section_id', function () {

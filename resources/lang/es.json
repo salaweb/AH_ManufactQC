@@ -94,17 +94,46 @@
         "family": "Familia",
         "description": "Descripción",
         "observations": "Observaciones",
-        "sections": "Secciones",
         "add": "Añadir proyecto",
         "edit": "Editar proyecto",
         "save": "Guardar",
         "cancel": "Cancelar",
         "delete": "Eliminar",
         "delete_confirm": "¿Seguro que quieres eliminar este proyecto? También se eliminarán sus OF y equipos.",
-        "no_sections": "Sin secciones",
         "new_family": "Nueva familia…",
-        "new_tag": "Nueva palabra de descripción…",
-        "search_tag": "Busca una palabra para añadirla…",
+        "new_section": "Nueva sección…",
+        "search_section": "Busca una sección para añadirla…",
         "add_failed": "No se ha podido añadir"
+    },
+    "category": {
+        "estetica": "Estética",
+        "funcional_mecanica": "Funcional / Mecánica",
+        "electronica": "Electrónica"
+    },
+    "admin_sections": {
+        "title": "Secciones",
+        "name": "Nombre",
+        "description": "Descripción",
+        "questions_count": "Preguntas",
+        "add": "Añadir sección",
+        "edit": "Editar sección",
+        "manage_questions": "Gestionar preguntas",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "delete_confirm": "¿Seguro que quieres eliminar esta sección? También se eliminarán sus preguntas."
+    },
+    "admin_questions": {
+        "title": "Preguntas de la sección",
+        "text": "Pregunta",
+        "category": "Categoría",
+        "order": "Orden",
+        "required": "Obligatoria",
+        "add": "Añadir pregunta",
+        "edit": "Editar pregunta",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "delete_confirm": "¿Seguro que quieres eliminar esta pregunta?"
     }
 }

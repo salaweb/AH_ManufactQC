@@ -11,7 +11,6 @@ const { t } = useI18n();
 const projects = ref([]);
 const sections = ref([]);
 const families = ref([]);
-const descriptionTags = ref([]);
 
 const formOpen = ref(false);
 const editingId = ref(null);
@@ -19,48 +18,48 @@ const errors = ref({});
 const saving = ref(false);
 
 const newFamilyName = ref('');
-const newTagName = ref('');
+const newSectionName = ref('');
 const newFamilyError = ref('');
-const newTagError = ref('');
-const tagQuery = ref('');
+const newSectionError = ref('');
+const sectionQuery = ref('');
 
-const tagResults = computed(() => {
-    const query = tagQuery.value.trim().toLowerCase();
+const sectionResults = computed(() => {
+    const query = sectionQuery.value.trim().toLowerCase();
 
     if (!query) {
         return [];
     }
 
-    return descriptionTags.value
-        .filter((tag) => !form.description_tag_ids.includes(tag.id))
-        .filter((tag) => tag.name.toLowerCase().includes(query))
+    return sections.value
+        .filter((section) => !form.section_ids.includes(section.id))
+        .filter((section) => section.name.toLowerCase().includes(query))
         .slice(0, 8);
 });
 
-function tagName(id) {
-    return descriptionTags.value.find((tag) => tag.id === id)?.name ?? '';
+function sectionName(id) {
+    return sections.value.find((section) => section.id === id)?.name ?? '';
 }
 
-function selectTag(tag) {
-    form.description_tag_ids.push(tag.id);
-    tagQuery.value = '';
+function selectSection(section) {
+    form.section_ids.push(section.id);
+    sectionQuery.value = '';
 }
 
-function removeSelectedTag(id) {
-    form.description_tag_ids = form.description_tag_ids.filter((tagId) => tagId !== id);
+function removeSelectedSection(id) {
+    form.section_ids = form.section_ids.filter((sectionId) => sectionId !== id);
 }
 
-function moveTagUp(index) {
+function moveSectionUp(index) {
     if (index === 0) {
         return;
     }
 
-    const ids = form.description_tag_ids;
+    const ids = form.section_ids;
     [ids[index - 1], ids[index]] = [ids[index], ids[index - 1]];
 }
 
-function moveTagDown(index) {
-    const ids = form.description_tag_ids;
+function moveSectionDown(index) {
+    const ids = form.section_ids;
 
     if (index === ids.length - 1) {
         return;
@@ -75,7 +74,6 @@ function blankForm() {
         family_id: '',
         observations: '',
         section_ids: [],
-        description_tag_ids: [],
     };
 }
 
@@ -85,17 +83,16 @@ async function load() {
     projects.value = await api.get('/api/projects');
     sections.value = await api.get('/api/sections');
     families.value = await api.get('/api/families');
-    descriptionTags.value = await api.get('/api/description-tags');
 }
 
 function openCreate() {
     editingId.value = null;
     errors.value = {};
     newFamilyName.value = '';
-    newTagName.value = '';
+    newSectionName.value = '';
     newFamilyError.value = '';
-    newTagError.value = '';
-    tagQuery.value = '';
+    newSectionError.value = '';
+    sectionQuery.value = '';
     Object.assign(form, blankForm());
     formOpen.value = true;
 }
@@ -104,16 +101,15 @@ function openEdit(project) {
     editingId.value = project.id;
     errors.value = {};
     newFamilyName.value = '';
-    newTagName.value = '';
+    newSectionName.value = '';
     newFamilyError.value = '';
-    newTagError.value = '';
-    tagQuery.value = '';
+    newSectionError.value = '';
+    sectionQuery.value = '';
     Object.assign(form, {
         number: project.number,
         family_id: project.family_id,
         observations: project.observations ?? '',
         section_ids: project.sections.map((section) => section.id),
-        description_tag_ids: project.description_tags.map((tag) => tag.id),
     });
     formOpen.value = true;
 }
@@ -168,21 +164,21 @@ async function addFamily() {
     }
 }
 
-async function addTag() {
-    if (!newTagName.value.trim()) {
+async function addSection() {
+    if (!newSectionName.value.trim()) {
         return;
     }
 
-    newTagError.value = '';
+    newSectionError.value = '';
 
     try {
-        const tag = await api.post('/api/description-tags', { name: newTagName.value.trim() });
-        descriptionTags.value.push(tag);
-        descriptionTags.value.sort((a, b) => a.name.localeCompare(b.name));
-        form.description_tag_ids.push(tag.id);
-        newTagName.value = '';
+        const section = await api.post('/api/sections', { name: newSectionName.value.trim() });
+        sections.value.push(section);
+        sections.value.sort((a, b) => a.name.localeCompare(b.name));
+        form.section_ids.push(section.id);
+        newSectionName.value = '';
     } catch (error) {
-        newTagError.value = error.data?.errors?.name?.[0] ?? t('admin_projects.add_failed');
+        newSectionError.value = error.data?.errors?.name?.[0] ?? t('admin_projects.add_failed');
     }
 }
 
@@ -212,7 +208,6 @@ onMounted(load);
                             <th class="px-4 py-2">{{ t('admin_projects.number') }}</th>
                             <th class="px-4 py-2">{{ t('admin_projects.family') }}</th>
                             <th class="px-4 py-2">{{ t('admin_projects.description') }}</th>
-                            <th class="px-4 py-2">{{ t('admin_projects.sections') }}</th>
                             <th class="px-4 py-2"></th>
                         </tr>
                     </thead>
@@ -221,13 +216,7 @@ onMounted(load);
                             <td class="px-4 py-2 font-medium">{{ project.number }}</td>
                             <td class="px-4 py-2">{{ project.family?.name }}</td>
                             <td class="px-4 py-2 text-gray-600">
-                                {{ project.description_tags.map((tag) => tag.name).join(' ') }}
-                            </td>
-                            <td class="px-4 py-2 text-gray-600">
-                                <span v-if="project.sections.length">
-                                    {{ project.sections.map((s) => s.name).join(', ') }}
-                                </span>
-                                <span v-else class="text-gray-400">{{ t('admin_projects.no_sections') }}</span>
+                                {{ project.sections.map((s) => s.name).join(' ') }}
                             </td>
                             <td class="space-x-2 px-4 py-2 text-right">
                                 <button type="button" class="text-gray-500 hover:text-gray-800" @click="openEdit(project)">
@@ -278,79 +267,74 @@ onMounted(load);
                 <div>
                     <label class="mb-1 block text-sm font-medium text-gray-700">{{ t('admin_projects.description') }}</label>
 
-                    <ol v-if="form.description_tag_ids.length" class="mb-2 space-y-1">
+                    <ol v-if="form.section_ids.length" class="mb-2 space-y-1">
                         <li
-                            v-for="(id, index) in form.description_tag_ids"
+                            v-for="(id, index) in form.section_ids"
                             :key="id"
                             class="flex items-center gap-2 rounded border border-gray-200 px-2 py-1 text-sm"
                         >
                             <span class="w-4 text-gray-400">{{ index + 1 }}</span>
-                            <span class="flex-1 text-gray-700">{{ tagName(id) }}</span>
-                            <button type="button" class="text-gray-400 disabled:opacity-30" :disabled="index === 0" @click="moveTagUp(index)">
+                            <span class="flex-1 text-gray-700">{{ sectionName(id) }}</span>
+                            <button
+                                type="button"
+                                class="text-gray-400 disabled:opacity-30"
+                                :disabled="index === 0"
+                                @click="moveSectionUp(index)"
+                            >
                                 ↑
                             </button>
                             <button
                                 type="button"
                                 class="text-gray-400 disabled:opacity-30"
-                                :disabled="index === form.description_tag_ids.length - 1"
-                                @click="moveTagDown(index)"
+                                :disabled="index === form.section_ids.length - 1"
+                                @click="moveSectionDown(index)"
                             >
                                 ↓
                             </button>
-                            <button type="button" class="text-red-500" @click="removeSelectedTag(id)">×</button>
+                            <button type="button" class="text-red-500" @click="removeSelectedSection(id)">×</button>
                         </li>
                     </ol>
 
                     <div class="relative">
                         <input
-                            v-model="tagQuery"
+                            v-model="sectionQuery"
                             type="text"
-                            :placeholder="t('admin_projects.search_tag')"
+                            :placeholder="t('admin_projects.search_section')"
                             class="w-full rounded border border-gray-300 px-3 py-2"
                         />
                         <ul
-                            v-if="tagResults.length"
+                            v-if="sectionResults.length"
                             class="absolute z-10 mt-1 w-full rounded border border-gray-200 bg-white shadow"
                         >
                             <li
-                                v-for="tag in tagResults"
-                                :key="tag.id"
+                                v-for="section in sectionResults"
+                                :key="section.id"
                                 class="cursor-pointer px-3 py-2 text-sm hover:bg-gray-100"
-                                @click="selectTag(tag)"
+                                @click="selectSection(section)"
                             >
-                                {{ tag.name }}
+                                {{ section.name }}
                             </li>
                         </ul>
                     </div>
 
                     <div class="mt-1 flex gap-2">
                         <input
-                            v-model="newTagName"
+                            v-model="newSectionName"
                             type="text"
-                            :placeholder="t('admin_projects.new_tag')"
+                            :placeholder="t('admin_projects.new_section')"
                             class="flex-1 rounded border border-gray-300 px-2 py-1 text-sm"
-                            @keydown.enter.prevent="addTag"
+                            @keydown.enter.prevent="addSection"
                         />
-                        <button type="button" class="rounded border border-gray-300 px-2 text-sm text-gray-600" @click="addTag">
+                        <button type="button" class="rounded border border-gray-300 px-2 text-sm text-gray-600" @click="addSection">
                             +
                         </button>
                     </div>
-                    <p v-if="newTagError" class="mt-1 text-sm text-red-600">{{ newTagError }}</p>
+                    <p v-if="newSectionError" class="mt-1 text-sm text-red-600">{{ newSectionError }}</p>
                 </div>
 
                 <div>
                     <label class="mb-1 block text-sm font-medium text-gray-700">{{ t('admin_projects.observations') }}</label>
                     <textarea v-model="form.observations" class="w-full rounded border border-gray-300 px-3 py-2" rows="2" />
-                </div>
-
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-gray-700">{{ t('admin_projects.sections') }}</label>
-                    <div class="space-y-1 rounded border border-gray-200 p-2">
-                        <label v-for="section in sections" :key="section.id" class="flex items-center gap-2 text-sm text-gray-700">
-                            <input type="checkbox" :value="section.id" v-model="form.section_ids" />
-                            {{ section.name }}
-                        </label>
-                    </div>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2">

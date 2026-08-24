@@ -28,14 +28,17 @@ function equipmentResponse() {
             serie_number: 'SN-0001',
             observations: null,
             order_fabrication_id: 5,
-            project: { description: 'Test project', observations: null },
+            project: {
+                observations: null,
+                sections: [{ id: 1, name: 'QUALITAT' }],
+            },
         },
         sections: [
             {
                 id: 1,
                 name: 'QUALITAT',
                 questions: [
-                    { id: 10, text: 'Acabat correcte?', order: 1, is_required: true, answer: null },
+                    { id: 10, text: 'Acabat correcte?', category: 'estetica', order: 1, is_required: true, answer: null },
                 ],
             },
         ],

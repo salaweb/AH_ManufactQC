@@ -13,7 +13,7 @@ class SectionController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(Section::orderBy('order')->get());
+        return response()->json(Section::withCount('questions')->orderBy('order')->get());
     }
 
     public function store(StoreSectionRequest $request): JsonResponse

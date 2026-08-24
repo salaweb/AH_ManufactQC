@@ -2,9 +2,9 @@
 
 use App\Enums\AnswerResponse;
 use App\Enums\EquipmentStatus;
+use App\Enums\QuestionCategory;
 use App\Models\Answer;
 use App\Models\Defect;
-use App\Models\DescriptionTag;
 use App\Models\Equipment;
 use App\Models\Family;
 use App\Models\OrderFabrication;
@@ -109,16 +109,27 @@ it('relates Project and Section many-to-many, a project only using a subset of t
         ->and($unusedSection->projects)->toHaveCount(0);
 });
 
-it('relates Project to a single Family and to many DescriptionTags', function () {
+it('relates Project to a single Family', function () {
     $family = Family::factory()->create(['name' => 'DB2']);
     $project = Project::factory()->create(['family_id' => $family->id]);
-    $tagA = DescriptionTag::factory()->create();
-    $tagB = DescriptionTag::factory()->create();
-
-    $project->descriptionTags()->attach([$tagA->id, $tagB->id]);
 
     expect($project->family->is($family))->toBeTrue()
-        ->and($family->projects->first()->is($project))->toBeTrue()
-        ->and($project->descriptionTags)->toHaveCount(2)
-        ->and($tagA->projects->first()->is($project))->toBeTrue();
+        ->and($family->projects->first()->is($project))->toBeTrue();
+});
+
+it('preserves the order Sections were attached to a Project in, via the pivot order column', function () {
+    $project = Project::factory()->create();
+    $sectionA = Section::factory()->create(['name' => 'AH17DX2']);
+    $sectionB = Section::factory()->create(['name' => 'USB']);
+
+    $project->sections()->attach($sectionA->id, ['order' => 1]);
+    $project->sections()->attach($sectionB->id, ['order' => 0]);
+
+    expect($project->sections->pluck('name')->all())->toBe(['USB', 'AH17DX2']);
+});
+
+it('casts Question category to the QuestionCategory enum', function () {
+    $question = Question::factory()->create(['category' => QuestionCategory::Electronica]);
+
+    expect($question->category)->toBe(QuestionCategory::Electronica);
 });

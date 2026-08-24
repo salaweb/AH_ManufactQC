@@ -11,7 +11,7 @@ use Illuminate\Http\Response;
 
 class ProjectController extends Controller
 {
-    private const WITH = ['sections', 'family', 'descriptionTags'];
+    private const WITH = ['sections', 'family'];
 
     public function index(): JsonResponse
     {
@@ -22,12 +22,10 @@ class ProjectController extends Controller
     {
         $data = $request->validated();
         $sectionIds = $data['section_ids'] ?? [];
-        $descriptionTagIds = $data['description_tag_ids'] ?? [];
-        unset($data['section_ids'], $data['description_tag_ids']);
+        unset($data['section_ids']);
 
         $project = Project::create($data);
-        $project->sections()->sync($sectionIds);
-        $this->syncDescriptionTags($project, $descriptionTagIds);
+        $this->syncSections($project, $sectionIds);
 
         return response()->json($project->load(self::WITH), 201);
     }
@@ -41,12 +39,10 @@ class ProjectController extends Controller
     {
         $data = $request->validated();
         $sectionIds = $data['section_ids'] ?? [];
-        $descriptionTagIds = $data['description_tag_ids'] ?? [];
-        unset($data['section_ids'], $data['description_tag_ids']);
+        unset($data['section_ids']);
 
         $project->update($data);
-        $project->sections()->sync($sectionIds);
-        $this->syncDescriptionTags($project, $descriptionTagIds);
+        $this->syncSections($project, $sectionIds);
 
         return response()->json($project->load(self::WITH));
     }
@@ -59,17 +55,18 @@ class ProjectController extends Controller
     }
 
     /**
-     * Sync description tags preserving the given array order in the pivot's `order` column.
+     * Sync sections preserving the given array order in the pivot's `order` column —
+     * this order also drives the project's combined description text.
      *
-     * @param  array<int>  $descriptionTagIds
+     * @param  array<int>  $sectionIds
      */
-    private function syncDescriptionTags(Project $project, array $descriptionTagIds): void
+    private function syncSections(Project $project, array $sectionIds): void
     {
-        $pivotData = collect($descriptionTagIds)
+        $pivotData = collect($sectionIds)
             ->values()
             ->mapWithKeys(fn ($id, $index) => [$id => ['order' => $index]])
             ->all();
 
-        $project->descriptionTags()->sync($pivotData);
+        $project->sections()->sync($pivotData);
     }
 }

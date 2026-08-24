@@ -15,6 +15,17 @@ const props = defineProps({
 
 const { t, locale } = useI18n();
 
+const categoryOrder = ['estetica', 'funcional_mecanica', 'electronica'];
+
+function questionsByCategory(section) {
+    return categoryOrder
+        .map((category) => ({
+            category,
+            questions: section.questions.filter((question) => question.category === category),
+        }))
+        .filter((group) => group.questions.length > 0);
+}
+
 const equipment = ref(null);
 const project = ref(null);
 const sections = ref([]);
@@ -91,7 +102,9 @@ onMounted(load);
             <OperariNav :back-href="`/operari/order-fabrications/${equipment.order_fabrication_id}/equipment-list`" />
 
             <div>
-                <h1 class="text-lg font-semibold text-gray-800">{{ project.description }}</h1>
+                <h1 class="text-lg font-semibold text-gray-800">
+                    {{ project.sections.map((s) => s.name).join(' ') }}
+                </h1>
                 <p v-if="project.observations" class="mt-1 text-sm text-gray-500">
                     {{ t('form.global_observations') }}: {{ project.observations }}
                 </p>
@@ -101,12 +114,16 @@ onMounted(load);
             <div v-for="section in sections" :key="section.id" class="space-y-4">
                 <h2 class="border-b pb-1 text-sm font-semibold uppercase text-gray-500">{{ section.name }}</h2>
 
-                <div v-for="question in section.questions" :key="question.id" class="space-y-2">
-                    <p class="text-sm text-gray-700">{{ question.text }}</p>
-                    <ButtonGroup
-                        :model-value="answers[question.id] ?? null"
-                        @update:model-value="(value) => answerQuestion(question, value)"
-                    />
+                <div v-for="group in questionsByCategory(section)" :key="group.category" class="space-y-3">
+                    <h3 class="text-xs font-semibold uppercase text-gray-400">{{ t(`category.${group.category}`) }}</h3>
+
+                    <div v-for="question in group.questions" :key="question.id" class="space-y-2">
+                        <p class="text-sm text-gray-700">{{ question.text }}</p>
+                        <ButtonGroup
+                            :model-value="answers[question.id] ?? null"
+                            @update:model-value="(value) => answerQuestion(question, value)"
+                        />
+                    </div>
                 </div>
             </div>
 

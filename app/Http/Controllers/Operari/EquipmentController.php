@@ -25,22 +25,21 @@ class EquipmentController extends Controller
 
     public function show(Equipment $equipment): JsonResponse
     {
-        $equipment->load(['project', 'orderFabrication', 'defects', 'photos']);
+        $equipment->load(['project.sections', 'orderFabrication', 'defects', 'photos']);
 
         $answers = $equipment->answers()->get()->keyBy('question_id');
 
         $sections = $equipment->project->sections()
             ->with(['questions' => fn ($query) => $query->orderBy('order')])
-            ->orderBy('order')
             ->get()
             ->map(fn (Section $section) => [
                 'id' => $section->id,
                 'name' => $section->name,
                 'description' => $section->description,
-                'order' => $section->order,
                 'questions' => $section->questions->map(fn (Question $question) => [
                     'id' => $question->id,
                     'text' => $question->text,
+                    'category' => $question->category,
                     'order' => $question->order,
                     'is_required' => $question->is_required,
                     'answer' => optional($answers->get($question->id))->only(['response', 'language_chosen']),

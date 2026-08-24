@@ -28,18 +28,13 @@ class Project extends Model
 
     public function sections(): BelongsToMany
     {
-        return $this->belongsToMany(Section::class);
+        return $this->belongsToMany(Section::class)
+            ->withPivot('order')
+            ->orderByPivot('order');
     }
 
     public function family(): BelongsTo
     {
         return $this->belongsTo(Family::class);
-    }
-
-    public function descriptionTags(): BelongsToMany
-    {
-        return $this->belongsToMany(DescriptionTag::class, 'project_description_tag')
-            ->withPivot('order')
-            ->orderByPivot('order');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\QuestionCategory;
 use App\Models\Question;
 use App\Models\Section;
 use Illuminate\Database\Seeder;
@@ -20,16 +21,17 @@ class SectionSeeder extends Seeder
         ]);
 
         $questions = [
-            'L\'acabat superficial és correcte?',
-            'Les connexions elèctriques estan ben fixades?',
-            'L\'etiquetatge és correcte i llegible?',
-            'Les dimensions compleixen l\'especificació?',
+            ['text' => 'L\'acabat superficial és correcte?', 'category' => QuestionCategory::Estetica],
+            ['text' => 'L\'etiquetatge és correcte i llegible?', 'category' => QuestionCategory::Estetica],
+            ['text' => 'Les dimensions compleixen l\'especificació?', 'category' => QuestionCategory::FuncionalMecanica],
+            ['text' => 'Les connexions elèctriques estan ben fixades?', 'category' => QuestionCategory::Electronica],
         ];
 
-        foreach ($questions as $index => $text) {
+        foreach ($questions as $index => $question) {
             Question::factory()->create([
                 'section_id' => $qualitat->id,
-                'text' => $text,
+                'text' => $question['text'],
+                'category' => $question['category'],
                 'order' => $index + 1,
                 'is_required' => true,
             ]);

@@ -29,8 +29,6 @@ class UpdateProjectRequest extends FormRequest
             'observations' => ['nullable', 'string'],
             'section_ids' => ['array'],
             'section_ids.*' => ['integer', 'exists:sections,id'],
-            'description_tag_ids' => ['array'],
-            'description_tag_ids.*' => ['integer', 'exists:description_tags,id'],
         ];
     }
 }

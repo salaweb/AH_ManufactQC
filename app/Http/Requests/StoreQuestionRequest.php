@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\QuestionCategory;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreQuestionRequest extends FormRequest
 {
@@ -25,6 +27,7 @@ class StoreQuestionRequest extends FormRequest
         return [
             'section_id' => ['required', 'integer', 'exists:sections,id'],
             'text' => ['required', 'string'],
+            'category' => ['required', Rule::enum(QuestionCategory::class)],
             'order' => ['nullable', 'integer', 'min:0'],
             'is_required' => ['boolean'],
         ];

@@ -94,17 +94,46 @@
         "family": "Família",
         "description": "Descripció",
         "observations": "Observacions",
-        "sections": "Seccions",
         "add": "Afegir projecte",
         "edit": "Editar projecte",
         "save": "Desa",
         "cancel": "Cancel·lar",
         "delete": "Eliminar",
         "delete_confirm": "Segur que vols eliminar aquest projecte? També s'eliminaran les seves OF i equipaments.",
-        "no_sections": "Sense seccions",
         "new_family": "Nova família…",
-        "new_tag": "Nova paraula de descripció…",
-        "search_tag": "Cerca una paraula per afegir-la…",
+        "new_section": "Nova secció…",
+        "search_section": "Cerca una secció per afegir-la…",
         "add_failed": "No s'ha pogut afegir"
+    },
+    "category": {
+        "estetica": "Estètica",
+        "funcional_mecanica": "Funcional / Mecànica",
+        "electronica": "Electrònica"
+    },
+    "admin_sections": {
+        "title": "Seccions",
+        "name": "Nom",
+        "description": "Descripció",
+        "questions_count": "Preguntes",
+        "add": "Afegir secció",
+        "edit": "Editar secció",
+        "manage_questions": "Gestionar preguntes",
+        "save": "Desa",
+        "cancel": "Cancel·lar",
+        "delete": "Eliminar",
+        "delete_confirm": "Segur que vols eliminar aquesta secció? També s'eliminaran les seves preguntes."
+    },
+    "admin_questions": {
+        "title": "Preguntes de la secció",
+        "text": "Pregunta",
+        "category": "Categoria",
+        "order": "Ordre",
+        "required": "Obligatòria",
+        "add": "Afegir pregunta",
+        "edit": "Editar pregunta",
+        "save": "Desa",
+        "cancel": "Cancel·lar",
+        "delete": "Eliminar",
+        "delete_confirm": "Segur que vols eliminar aquesta pregunta?"
     }
 }

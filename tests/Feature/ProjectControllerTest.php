@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\DescriptionTag;
 use App\Models\Equipment;
 use App\Models\Family;
 use App\Models\OrderFabrication;
@@ -42,51 +41,47 @@ it('rejects creating a project without a family', function () {
     $response->assertUnprocessable()->assertJsonValidationErrors('family_id');
 });
 
-it('creates a project with the selected sections and description tags attached', function () {
+it('creates a project with the selected sections attached', function () {
     $family = Family::factory()->create();
     $sectionA = Section::factory()->create();
     $sectionB = Section::factory()->create();
     Section::factory()->create(); // not selected
-    $tagA = DescriptionTag::factory()->create();
-    $tagB = DescriptionTag::factory()->create();
 
     $response = $this->postJson('/api/projects', [
         'number' => '1400C0002.00',
         'family_id' => $family->id,
         'section_ids' => [$sectionA->id, $sectionB->id],
-        'description_tag_ids' => [$tagA->id, $tagB->id],
     ]);
 
     $response->assertCreated();
     $project = Project::where('number', '1400C0002.00')->firstOrFail();
-    expect($project->sections)->toHaveCount(2)
-        ->and($project->descriptionTags)->toHaveCount(2);
+    expect($project->sections)->toHaveCount(2);
 });
 
-it('preserves the order description tags were given in, not alphabetical order', function () {
+it('preserves the order sections were given in, not alphabetical order', function () {
     $family = Family::factory()->create();
-    $tagUsb = DescriptionTag::factory()->create(['name' => 'USB']);
-    $tagAh = DescriptionTag::factory()->create(['name' => 'AH17DX2']);
-    $tagTs = DescriptionTag::factory()->create(['name' => 'TS']);
+    $sectionUsb = Section::factory()->create(['name' => 'USB']);
+    $sectionAh = Section::factory()->create(['name' => 'AH17DX2']);
+    $sectionTs = Section::factory()->create(['name' => 'TS']);
 
     $response = $this->postJson('/api/projects', [
         'number' => '1400C0003.00',
         'family_id' => $family->id,
-        'description_tag_ids' => [$tagAh->id, $tagTs->id, $tagUsb->id],
+        'section_ids' => [$sectionAh->id, $sectionTs->id, $sectionUsb->id],
     ]);
 
     $response->assertCreated();
     $project = Project::where('number', '1400C0003.00')->firstOrFail();
-    expect($project->descriptionTags->pluck('name')->all())->toBe(['AH17DX2', 'TS', 'USB']);
+    expect($project->sections->pluck('name')->all())->toBe(['AH17DX2', 'TS', 'USB']);
 
     // re-order on update: USB first now
     $this->putJson("/api/projects/{$project->id}", [
         'number' => $project->number,
         'family_id' => $project->family_id,
-        'description_tag_ids' => [$tagUsb->id, $tagAh->id, $tagTs->id],
+        'section_ids' => [$sectionUsb->id, $sectionAh->id, $sectionTs->id],
     ])->assertOk();
 
-    expect($project->fresh()->descriptionTags->pluck('name')->all())->toBe(['USB', 'AH17DX2', 'TS']);
+    expect($project->fresh()->sections->pluck('name')->all())->toBe(['USB', 'AH17DX2', 'TS']);
 });
 
 it('updates the sections attached to a project', function () {

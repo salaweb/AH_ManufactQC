@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('project_id')->constrained()->cascadeOnDelete();
             $table->foreignId('section_id')->constrained()->cascadeOnDelete();
+            $table->unsignedInteger('order')->default(0);
             $table->timestamps();
 
             $table->unique(['project_id', 'section_id']);

@@ -6,6 +6,7 @@ use App\Http\Middleware\Admin\EnsureAdminOrQc;
 use App\Http\Middleware\Operari\EnsureOperari;
 use App\Models\Equipment;
 use App\Models\OrderFabrication;
+use App\Models\Section;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -28,6 +29,14 @@ Route::get('/admin/dashboard', function () {
 Route::get('/admin/projects', function () {
     return Inertia::render('Admin/ProjectIndex');
 })->middleware(['auth', EnsureAdminOrQc::class])->name('admin.projects');
+
+Route::get('/admin/sections', function () {
+    return Inertia::render('Admin/SectionIndex');
+})->middleware(['auth', EnsureAdminOrQc::class])->name('admin.sections');
+
+Route::get('/admin/sections/{section}/questions', function (Section $section) {
+    return Inertia::render('Admin/QuestionIndex', ['sectionId' => $section->id]);
+})->middleware(['auth', EnsureAdminOrQc::class])->name('admin.sections.questions');
 
 Route::get('/operari', function () {
     return Inertia::render('Operari/ProjectSelector');

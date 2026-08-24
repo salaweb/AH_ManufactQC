@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('section_id')->constrained()->cascadeOnDelete();
             $table->string('text');
+            $table->string('category');
             $table->unsignedInteger('order')->default(0);
             $table->boolean('is_required')->default(true);
             $table->timestamps();

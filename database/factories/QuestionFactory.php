@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\QuestionCategory;
 use App\Models\Question;
 use App\Models\Section;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -21,6 +22,7 @@ class QuestionFactory extends Factory
         return [
             'section_id' => Section::factory(),
             'text' => $this->faker->sentence().'?',
+            'category' => $this->faker->randomElement(QuestionCategory::cases()),
             'order' => 0,
             'is_required' => true,
         ];

@@ -18,7 +18,6 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             SectionSeeder::class,
             FamilySeeder::class,
-            DescriptionTagSeeder::class,
             ProjectSeeder::class,
         ]);
     }
