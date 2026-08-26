@@ -22,7 +22,8 @@
     "selector": {
         "title": "Cerca l'OF",
         "order_number": "Número d'OF",
-        "no_results": "Sense resultats"
+        "no_results": "Sense resultats",
+        "equipment_count": "{count} equips"
     },
     "form": {
         "global_observations": "Observacions del projecte",
@@ -64,7 +65,8 @@
         "serie_number": "Número de sèrie",
         "status": "Estat",
         "defects": "Defectes",
-        "observations": "Observacions"
+        "observations": "Observacions",
+        "equipment_count": "{count} equips"
     },
     "status": {
         "pending": "Pendent",

@@ -44,12 +44,18 @@ onMounted(load);
 
             <div v-if="orderFabrication">
                 <h1 class="text-lg font-semibold text-gray-800">
-                    {{ orderFabrication.project.number }} — {{ orderFabrication.project.family }}
+                    {{ orderFabrication.project.number }} — {{ orderFabrication.project.family.name }}
                 </h1>
+                <p class="text-sm text-gray-500">
+                    {{ orderFabrication.project.sections.map((s) => s.name).join(' ') }}
+                </p>
                 <p class="text-sm text-gray-500">{{ t('selector.order_number') }}: {{ orderFabrication.number }}</p>
             </div>
 
-            <h2 class="text-sm font-semibold uppercase text-gray-500">{{ t('list.title') }}</h2>
+            <div class="flex items-center justify-between">
+                <h2 class="text-sm font-semibold uppercase text-gray-500">{{ t('list.title') }}</h2>
+                <span class="text-sm text-gray-400">{{ t('list.equipment_count', { count: equipment.length }) }}</span>
+            </div>
 
             <table class="w-full text-left text-sm">
                 <thead>

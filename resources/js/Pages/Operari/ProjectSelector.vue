@@ -57,8 +57,14 @@ function selectOrderFabrication(orderFabrication) {
                         class="cursor-pointer px-3 py-2 hover:bg-gray-100"
                         @click="selectOrderFabrication(of)"
                     >
-                        <span class="font-medium">{{ of.number }}</span>
-                        <span class="text-gray-500"> — {{ of.project.number }} ({{ of.project.family }})</span>
+                        <div>
+                            <span class="font-medium">{{ of.number }}</span>
+                            <span class="text-gray-500"> — {{ of.project.number }} ({{ of.project.family.name }})</span>
+                            <span class="text-gray-400"> · {{ t('selector.equipment_count', { count: of.equipment_count }) }}</span>
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            {{ of.project.sections.map((s) => s.name).join(' ') }}
+                        </div>
                     </li>
                 </ul>
                 <p v-else-if="query && !searching" class="mt-1 text-sm text-gray-400">

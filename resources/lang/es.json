@@ -22,7 +22,8 @@
     "selector": {
         "title": "Busca la OF",
         "order_number": "Número de OF",
-        "no_results": "Sin resultados"
+        "no_results": "Sin resultados",
+        "equipment_count": "{count} equipos"
     },
     "form": {
         "global_observations": "Observaciones del proyecto",
@@ -64,7 +65,8 @@
         "serie_number": "Número de serie",
         "status": "Estado",
         "defects": "Defectos",
-        "observations": "Observaciones"
+        "observations": "Observaciones",
+        "equipment_count": "{count} equipos"
     },
     "status": {
         "pending": "Pendiente",

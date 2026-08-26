@@ -16,8 +16,10 @@ beforeEach(function () {
     $this->actingAs(User::factory()->operari()->create());
 });
 
-it('lists equipment for an order fabrication, alongside the OF and its project', function () {
+it('lists equipment for an order fabrication, alongside the OF, its project, family and sections', function () {
     $orderFabrication = OrderFabrication::factory()->create();
+    $section = Section::factory()->create(['name' => 'AH17DX2']);
+    $orderFabrication->project->sections()->attach($section, ['order' => 0]);
     Equipment::factory()->count(3)->create([
         'project_id' => $orderFabrication->project_id,
         'order_fabrication_id' => $orderFabrication->id,
@@ -27,7 +29,9 @@ it('lists equipment for an order fabrication, alongside the OF and its project',
 
     $response->assertOk()->assertJsonCount(3, 'equipment');
     expect($response->json('order_fabrication.id'))->toBe($orderFabrication->id)
-        ->and($response->json('order_fabrication.project.id'))->toBe($orderFabrication->project_id);
+        ->and($response->json('order_fabrication.project.id'))->toBe($orderFabrication->project_id)
+        ->and($response->json('order_fabrication.project.family.id'))->toBe($orderFabrication->project->family_id)
+        ->and($response->json('order_fabrication.project.sections.0.name'))->toBe('AH17DX2');
 });
 
 it('shows equipment with sections, questions and existing answers', function () {

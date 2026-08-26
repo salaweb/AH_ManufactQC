@@ -12,7 +12,8 @@ class OrderFabricationController extends Controller
     public function index(Request $request): JsonResponse
     {
         $orderFabrications = OrderFabrication::query()
-            ->with('project')
+            ->with(['project.family', 'project.sections'])
+            ->withCount('equipment')
             ->when($request->filled('q'), fn ($query) => $query->where('number', 'like', '%'.$request->string('q').'%'))
             ->orderBy('number')
             ->limit(10)
