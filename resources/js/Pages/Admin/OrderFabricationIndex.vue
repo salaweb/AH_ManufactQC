@@ -105,6 +105,7 @@ onMounted(load);
                         <tr class="border-b text-gray-500">
                             <th class="px-4 py-2">{{ t('admin_order_fabrications.number') }}</th>
                             <th class="px-4 py-2">{{ t('admin_order_fabrications.project') }}</th>
+                            <th class="px-4 py-2">{{ t('admin_order_fabrications.description') }}</th>
                             <th class="px-4 py-2">{{ t('admin_order_fabrications.equipment_count') }}</th>
                             <th class="px-4 py-2"></th>
                         </tr>
@@ -113,6 +114,12 @@ onMounted(load);
                         <tr v-for="orderFabrication in orderFabrications" :key="orderFabrication.id" class="border-b">
                             <td class="px-4 py-2 font-medium">{{ orderFabrication.number }}</td>
                             <td class="px-4 py-2 text-gray-600">{{ orderFabrication.project?.number }}</td>
+                            <td
+                                class="max-w-xs truncate px-4 py-2 text-gray-600"
+                                :title="orderFabrication.project?.sections.map((s) => s.name).join(' ')"
+                            >
+                                {{ orderFabrication.project?.sections.map((s) => s.name).join(' ') }}
+                            </td>
                             <td class="px-4 py-2 text-gray-600">{{ orderFabrication.equipment_count ?? 0 }}</td>
                             <td class="space-x-2 px-4 py-2 text-right">
                                 <Button variant="ghost" @click="manageEquipment(orderFabrication)">

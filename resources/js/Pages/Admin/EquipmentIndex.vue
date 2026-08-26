@@ -202,10 +202,15 @@ onMounted(load);
             </Link>
 
             <div class="flex items-center justify-between">
-                <h1 class="text-lg font-semibold text-gray-800">
-                    {{ t('admin_equipment.title') }} — {{ orderFabrication?.number }}
-                    <span class="text-sm font-normal text-gray-500">({{ orderFabrication?.project?.number }})</span>
-                </h1>
+                <div>
+                    <h1 class="text-lg font-semibold text-gray-800">
+                        {{ t('admin_equipment.title') }} — {{ orderFabrication?.number }}
+                    </h1>
+                    <p class="text-base font-medium text-gray-700">
+                        {{ orderFabrication?.project?.number }} —
+                        {{ orderFabrication?.project?.sections.map((s) => s.name).join(' ') }}
+                    </p>
+                </div>
                 <div class="flex gap-2">
                     <Button variant="outline" @click="openGenerate">
                         {{ t('admin_equipment.generate_title') }}

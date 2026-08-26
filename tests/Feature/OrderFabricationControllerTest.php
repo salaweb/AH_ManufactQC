@@ -3,6 +3,7 @@
 use App\Models\Equipment;
 use App\Models\OrderFabrication;
 use App\Models\Project;
+use App\Models\Section;
 use App\Models\User;
 
 beforeEach(function () {
@@ -55,8 +56,10 @@ it('lists order fabrications filtered by project', function () {
     $response->assertOk()->assertJsonCount(2);
 });
 
-it('includes the project and equipment count when listing order fabrications', function () {
+it('includes the project (with its family and sections) and equipment count when listing order fabrications', function () {
     $project = Project::factory()->create();
+    $section = Section::factory()->create(['name' => 'AH17DX2']);
+    $project->sections()->attach($section, ['order' => 0]);
     $orderFabrication = OrderFabrication::factory()->for($project)->create();
     Equipment::factory()->for($project)->for($orderFabrication)->count(3)->create();
 
@@ -65,6 +68,8 @@ it('includes the project and equipment count when listing order fabrications', f
     $response->assertOk();
     $data = collect($response->json())->firstWhere('id', $orderFabrication->id);
     expect($data['project']['id'])->toBe($project->id)
+        ->and($data['project']['family']['id'])->toBe($project->family_id)
+        ->and($data['project']['sections'][0]['name'])->toBe('AH17DX2')
         ->and($data['equipment_count'])->toBe(3);
 });
 

@@ -162,6 +162,7 @@
         "title": "Órdenes de fabricación",
         "number": "Número OF",
         "project": "Proyecto",
+        "description": "Descripción",
         "equipment_count": "Equipos",
         "add": "Añadir OF",
         "edit": "Editar OF",
@@ -172,7 +173,7 @@
         "delete_confirm": "¿Seguro que quieres eliminar esta OF? También se eliminarán sus equipos."
     },
     "admin_equipment": {
-        "title": "Equipos",
+        "title": "Orden de Fabricación - OF",
         "serie_number": "Número de serie",
         "status": "Estado",
         "observations": "Observaciones",
