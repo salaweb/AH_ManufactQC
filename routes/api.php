@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 Route::apiResource('projects', ProjectController::class);
 Route::apiResource('sections', SectionController::class);
 Route::apiResource('questions', QuestionController::class);
+Route::post('sections/{section}/questions/reorder', [QuestionController::class, 'reorder']);
 Route::apiResource('users', UserController::class);
 Route::apiResource('order-fabrications', OrderFabricationController::class);
 Route::apiResource('equipment', EquipmentController::class);

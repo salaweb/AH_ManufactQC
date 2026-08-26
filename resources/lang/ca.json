@@ -127,7 +127,6 @@
         "title": "Preguntes de la secció",
         "text": "Pregunta",
         "category": "Categoria",
-        "order": "Ordre",
         "required": "Obligatòria",
         "add": "Afegir pregunta",
         "edit": "Editar pregunta",

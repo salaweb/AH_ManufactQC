@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
+import { VueDraggable } from 'vue-draggable-plus';
 import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
-import FormField from '../../Components/FormField.vue';
 import { api } from '../../api';
 
 const props = defineProps({
@@ -22,7 +22,7 @@ const errors = ref({});
 const saving = ref(false);
 
 function blankForm() {
-    return { text: '', category: categories[0], order: 0, is_required: true };
+    return { text: '', category: categories[0], is_required: true };
 }
 
 const form = reactive(blankForm());
@@ -45,7 +45,6 @@ function openEdit(question) {
     Object.assign(form, {
         text: question.text,
         category: question.category,
-        order: question.order,
         is_required: question.is_required,
     });
     formOpen.value = true;
@@ -60,12 +59,10 @@ async function save() {
     errors.value = {};
 
     try {
-        const payload = { ...form, section_id: props.sectionId };
-
         if (editingId.value) {
-            await api.put(`/api/questions/${editingId.value}`, payload);
+            await api.put(`/api/questions/${editingId.value}`, { ...form, section_id: props.sectionId });
         } else {
-            await api.post('/api/questions', payload);
+            await api.post('/api/questions', { ...form, section_id: props.sectionId, order: questions.value.length });
         }
         formOpen.value = false;
         await load();
@@ -83,6 +80,12 @@ async function remove(question) {
 
     await api.delete(`/api/questions/${question.id}`);
     await load();
+}
+
+async function onReorder() {
+    questions.value = await api.post(`/api/sections/${props.sectionId}/questions/reorder`, {
+        question_ids: questions.value.map((question) => question.id),
+    });
 }
 
 onMounted(load);
@@ -107,31 +110,33 @@ onMounted(load);
             </div>
 
             <div class="rounded-lg bg-white shadow">
-                <table class="w-full text-left text-sm">
-                    <thead>
-                        <tr class="border-b text-gray-500">
-                            <th class="px-4 py-2">{{ t('admin_questions.text') }}</th>
-                            <th class="px-4 py-2">{{ t('admin_questions.category') }}</th>
-                            <th class="px-4 py-2">{{ t('admin_questions.order') }}</th>
-                            <th class="px-4 py-2"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="question in questions" :key="question.id" class="border-b">
-                            <td class="px-4 py-2 font-medium">{{ question.text }}</td>
-                            <td class="px-4 py-2 text-gray-600">{{ t(`category.${question.category}`) }}</td>
-                            <td class="px-4 py-2 text-gray-600">{{ question.order }}</td>
-                            <td class="space-x-2 px-4 py-2 text-right">
-                                <button type="button" class="text-gray-500 hover:text-gray-800" @click="openEdit(question)">
-                                    {{ t('admin_questions.edit') }}
-                                </button>
-                                <button type="button" class="text-red-500 hover:text-red-700" @click="remove(question)">
-                                    {{ t('admin_questions.delete') }}
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="flex items-center gap-3 border-b px-4 py-2 text-sm text-gray-500">
+                    <span class="w-4"></span>
+                    <span class="flex-1">{{ t('admin_questions.text') }}</span>
+                    <span class="w-36">{{ t('admin_questions.category') }}</span>
+                    <span class="w-32"></span>
+                </div>
+                <VueDraggable
+                    v-model="questions"
+                    :animation="200"
+                    handle=".drag-handle"
+                    ghost-class="opacity-40"
+                    @end="onReorder"
+                >
+                    <div v-for="question in questions" :key="question.id" class="flex items-center gap-3 border-b px-4 py-2">
+                        <span class="drag-handle w-4 cursor-move text-gray-300">⠿</span>
+                        <span class="flex-1 text-sm font-medium">{{ question.text }}</span>
+                        <span class="w-36 text-sm text-gray-600">{{ t(`category.${question.category}`) }}</span>
+                        <span class="flex w-32 justify-end gap-2">
+                            <button type="button" class="text-sm text-gray-500 hover:text-gray-800" @click="openEdit(question)">
+                                {{ t('admin_questions.edit') }}
+                            </button>
+                            <button type="button" class="text-sm text-red-500 hover:text-red-700" @click="remove(question)">
+                                {{ t('admin_questions.delete') }}
+                            </button>
+                        </span>
+                    </div>
+                </VueDraggable>
             </div>
         </div>
 
@@ -153,8 +158,6 @@ onMounted(load);
                         <option v-for="cat in categories" :key="cat" :value="cat">{{ t(`category.${cat}`) }}</option>
                     </select>
                 </div>
-
-                <FormField v-model="form.order" type="number" :label="t('admin_questions.order')" />
 
                 <label class="flex items-center gap-2 text-sm text-gray-700">
                     <input type="checkbox" v-model="form.is_required" />

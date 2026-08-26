@@ -56,3 +56,33 @@ it('returns questions ordered by the order column', function () {
     $response->assertOk();
     expect(collect($response->json())->pluck('text')->all())->toBe(['First', 'Second']);
 });
+
+it('reorders questions within a section via drag-and-drop order', function () {
+    $section = Section::factory()->create();
+    $first = Question::factory()->create(['section_id' => $section->id, 'order' => 0, 'text' => 'First']);
+    $second = Question::factory()->create(['section_id' => $section->id, 'order' => 1, 'text' => 'Second']);
+    $third = Question::factory()->create(['section_id' => $section->id, 'order' => 2, 'text' => 'Third']);
+
+    $response = $this->postJson("/api/sections/{$section->id}/questions/reorder", [
+        'question_ids' => [$third->id, $first->id, $second->id],
+    ]);
+
+    $response->assertOk();
+    expect(collect($response->json())->pluck('text')->all())->toBe(['Third', 'First', 'Second'])
+        ->and($third->fresh()->order)->toBe(0)
+        ->and($first->fresh()->order)->toBe(1)
+        ->and($second->fresh()->order)->toBe(2);
+});
+
+it('rejects reordering with a question id from another section', function () {
+    $section = Section::factory()->create();
+    $otherSection = Section::factory()->create();
+    $question = Question::factory()->create(['section_id' => $section->id]);
+    $foreignQuestion = Question::factory()->create(['section_id' => $otherSection->id]);
+
+    $response = $this->postJson("/api/sections/{$section->id}/questions/reorder", [
+        'question_ids' => [$question->id, $foreignQuestion->id],
+    ]);
+
+    $response->assertUnprocessable()->assertJsonValidationErrors('question_ids.1');
+});

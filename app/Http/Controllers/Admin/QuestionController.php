@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreQuestionRequest;
 use App\Http\Requests\UpdateQuestionRequest;
 use App\Models\Question;
+use App\Models\Section;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
 
 class QuestionController extends Controller
 {
@@ -46,5 +48,21 @@ class QuestionController extends Controller
         $question->delete();
 
         return response()->noContent();
+    }
+
+    public function reorder(Request $request, Section $section): JsonResponse
+    {
+        $data = $request->validate([
+            'question_ids' => ['required', 'array'],
+            'question_ids.*' => ['integer', Rule::exists('questions', 'id')->where('section_id', $section->id)],
+        ]);
+
+        foreach ($data['question_ids'] as $index => $id) {
+            Question::whereKey($id)->update(['order' => $index]);
+        }
+
+        return response()->json(
+            $section->questions()->orderBy('order')->get()
+        );
     }
 }

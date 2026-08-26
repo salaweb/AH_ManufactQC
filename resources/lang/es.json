@@ -127,7 +127,6 @@
         "title": "Preguntas de la sección",
         "text": "Pregunta",
         "category": "Categoría",
-        "order": "Orden",
         "required": "Obligatoria",
         "add": "Añadir pregunta",
         "edit": "Editar pregunta",
