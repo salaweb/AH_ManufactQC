@@ -3,8 +3,9 @@ import { ref } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import { Menu, X } from '@lucide/vue';
+import { setLocale } from '../i18n';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const open = ref(false);
 
 function logout() {
@@ -71,7 +72,26 @@ function logout() {
             </Link>
         </nav>
 
-        <div class="border-t p-2">
+        <div class="space-y-2 border-t p-2">
+            <div class="flex gap-1 rounded-full bg-gray-100 p-1">
+                <button
+                    type="button"
+                    class="flex-1 rounded-full px-3 py-1 text-sm transition duration-100 ease-out active:scale-95"
+                    :class="locale === 'ca' ? 'bg-gray-800 text-white' : 'text-gray-600'"
+                    @click="setLocale('ca')"
+                >
+                    {{ t('language.ca') }}
+                </button>
+                <button
+                    type="button"
+                    class="flex-1 rounded-full px-3 py-1 text-sm transition duration-100 ease-out active:scale-95"
+                    :class="locale === 'es' ? 'bg-gray-800 text-white' : 'text-gray-600'"
+                    @click="setLocale('es')"
+                >
+                    {{ t('language.es') }}
+                </button>
+            </div>
+
             <button
                 type="button"
                 class="block w-full rounded px-3 py-2 text-left text-sm text-gray-500 transition duration-100 ease-out hover:bg-gray-50 hover:text-gray-700 active:scale-[0.98]"

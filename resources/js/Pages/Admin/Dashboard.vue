@@ -1,7 +1,6 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import LanguageSelector from '../../Components/LanguageSelector.vue';
 import AdminSidebar from '../../Components/AdminSidebar.vue';
 import StatCard from '../../Components/StatCard.vue';
 import ChartDefects from '../../Components/ChartDefects.vue';
@@ -59,11 +58,10 @@ onMounted(() => {
 </script>
 
 <template>
-    <LanguageSelector />
     <AdminSidebar />
 
     <div class="min-h-screen bg-gray-50 px-4 pb-10 pt-16">
-        <div class="mx-auto max-w-6xl space-y-6">
+        <div class="mx-auto max-w-7xl space-y-6">
             <h1 class="text-lg font-semibold text-gray-800">{{ t('dashboard.title') }}</h1>
 
             <FilterBar v-model="filters" :projects="projects" />

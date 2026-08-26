@@ -2,7 +2,6 @@
 import { onMounted, reactive, ref } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
 import { useI18n } from 'vue-i18n';
-import LanguageSelector from '../../Components/LanguageSelector.vue';
 import AdminSidebar from '../../Components/AdminSidebar.vue';
 import Button from '../../Components/Button.vue';
 import { api } from '../../api';
@@ -93,11 +92,10 @@ onMounted(load);
 </script>
 
 <template>
-    <LanguageSelector />
     <AdminSidebar />
 
     <div class="min-h-screen bg-gray-50 px-4 pb-10 pt-16">
-        <div class="mx-auto max-w-5xl space-y-4">
+        <div class="mx-auto max-w-7xl space-y-4">
             <div class="flex items-center justify-between">
                 <h1 class="text-lg font-semibold text-gray-800">
                     {{ t('admin_questions.title') }} — {{ section?.name }}
