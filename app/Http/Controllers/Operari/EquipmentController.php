@@ -27,7 +27,7 @@ class EquipmentController extends Controller
     {
         $equipment->load(['project.sections', 'orderFabrication', 'defects', 'photos']);
 
-        $answers = $equipment->answers()->get()->keyBy('question_id');
+        $answers = $equipment->answers()->with('defects')->get()->keyBy('question_id');
 
         $sections = $equipment->project->sections()
             ->with(['questions' => fn ($query) => $query->orderBy('order')])
@@ -36,14 +36,23 @@ class EquipmentController extends Controller
                 'id' => $section->id,
                 'name' => $section->name,
                 'description' => $section->description,
-                'questions' => $section->questions->map(fn (Question $question) => [
-                    'id' => $question->id,
-                    'text' => $question->text,
-                    'category' => $question->category,
-                    'order' => $question->order,
-                    'is_required' => $question->is_required,
-                    'answer' => optional($answers->get($question->id))->only(['response', 'language_chosen']),
-                ]),
+                'questions' => $section->questions->map(function (Question $question) use ($answers) {
+                    $answer = $answers->get($question->id);
+
+                    return [
+                        'id' => $question->id,
+                        'text' => $question->text,
+                        'category' => $question->category,
+                        'order' => $question->order,
+                        'is_required' => $question->is_required,
+                        'answer' => $answer ? [
+                            'id' => $answer->id,
+                            'response' => $answer->response,
+                            'language_chosen' => $answer->language_chosen,
+                            'defects' => $answer->defects,
+                        ] : null,
+                    ];
+                }),
             ]);
 
         return response()->json([

@@ -54,6 +54,37 @@ it('shows equipment with sections, questions and existing answers', function () 
         ->and($payload['sections'][0]['questions'][0]['answer']['response'])->toBe('yes');
 });
 
+it('includes the answer id and its recorded defects, so a re-opened defect question shows what was already written', function () {
+    $equipment = Equipment::factory()->create();
+    $section = Section::factory()->create(['order' => 1]);
+    $equipment->project->sections()->attach($section);
+    $question = Question::factory()->create(['section_id' => $section->id, 'order' => 1]);
+    $answer = Answer::factory()->create([
+        'equipment_id' => $equipment->id,
+        'question_id' => $question->id,
+        'response' => AnswerResponse::Defect,
+    ]);
+    $defect = Defect::factory()->create([
+        'equipment_id' => $equipment->id,
+        'answer_id' => $answer->id,
+        'tipo' => 'visual',
+        'observation' => 'Ratllada a la carcassa',
+        'actions' => 'Substituir la peça',
+    ]);
+
+    $response = $this->getJson("/operari/api/equipment/{$equipment->id}");
+
+    $response->assertOk();
+    $questionPayload = $response->json('sections.0.questions.0');
+
+    expect($questionPayload['answer']['id'])->toBe($answer->id)
+        ->and($questionPayload['answer']['response'])->toBe('defect')
+        ->and($questionPayload['answer']['defects'])->toHaveCount(1)
+        ->and($questionPayload['answer']['defects'][0]['id'])->toBe($defect->id)
+        ->and($questionPayload['answer']['defects'][0]['observation'])->toBe('Ratllada a la carcassa')
+        ->and($questionPayload['answer']['defects'][0]['actions'])->toBe('Substituir la peça');
+});
+
 it('only shows sections assigned to the equipment\'s project, not every section in the system', function () {
     $equipment = Equipment::factory()->create();
     $assignedSection = Section::factory()->create(['name' => 'ASSIGNED']);

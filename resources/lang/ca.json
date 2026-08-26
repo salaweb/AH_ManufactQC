@@ -39,6 +39,8 @@
     },
     "defect": {
         "title": "Registrar defecte",
+        "edit_title": "Editar defecte",
+        "edit": "Editar",
         "type": "Tipus",
         "observation": "Observació",
         "responsibility": "Responsabilitat",

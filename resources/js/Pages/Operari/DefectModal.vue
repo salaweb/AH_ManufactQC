@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Button from '../../Components/Button.vue';
 import { api } from '../../api';
@@ -8,6 +8,7 @@ const props = defineProps({
     open: { type: Boolean, default: false },
     equipmentId: { type: [Number, String], required: true },
     answerId: { type: [Number, String], default: null },
+    editingDefect: { type: Object, default: null },
 });
 
 const emit = defineEmits(['close', 'saved']);
@@ -29,19 +30,42 @@ function blankForm() {
 const form = reactive(blankForm());
 const saving = reactive({ value: false });
 
+watch(
+    () => props.open,
+    (isOpen) => {
+        if (!isOpen) {
+            return;
+        }
+
+        Object.assign(
+            form,
+            props.editingDefect
+                ? {
+                      tipo: props.editingDefect.tipo,
+                      observation: props.editingDefect.observation ?? '',
+                      responsibility: props.editingDefect.responsibility ?? responsibilities[0],
+                      actions: props.editingDefect.actions ?? '',
+                  }
+                : blankForm(),
+        );
+    },
+);
+
 async function save(keepOpen) {
     saving.value = true;
 
     try {
-        const defect = await api.post('/operari/api/defects', {
-            equipment_id: props.equipmentId,
-            answer_id: props.answerId,
-            ...form,
-        });
+        const defect = props.editingDefect
+            ? await api.put(`/operari/api/defects/${props.editingDefect.id}`, form)
+            : await api.post('/operari/api/defects', {
+                  equipment_id: props.equipmentId,
+                  answer_id: props.answerId,
+                  ...form,
+              });
 
         emit('saved', defect);
 
-        if (keepOpen) {
+        if (keepOpen && !props.editingDefect) {
             Object.assign(form, blankForm());
         } else {
             emit('close');
@@ -55,7 +79,9 @@ async function save(keepOpen) {
 <template>
     <div v-if="open" class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
         <div class="w-full max-w-sm space-y-3 rounded-lg bg-white p-6 shadow-lg">
-            <h2 class="text-base font-semibold text-gray-800">{{ t('defect.title') }}</h2>
+            <h2 class="text-base font-semibold text-gray-800">
+                {{ editingDefect ? t('defect.edit_title') : t('defect.title') }}
+            </h2>
 
             <div>
                 <label class="mb-1 block text-sm font-medium text-gray-700">{{ t('defect.type') }}</label>
@@ -87,7 +113,7 @@ async function save(keepOpen) {
                 <Button variant="danger" class="w-full" :disabled="saving.value" @click="save(false)">
                     {{ t('defect.save') }}
                 </Button>
-                <Button variant="outline" class="w-full" :disabled="saving.value" @click="save(true)">
+                <Button v-if="!editingDefect" variant="outline" class="w-full" :disabled="saving.value" @click="save(true)">
                     {{ t('defect.add_another') }}
                 </Button>
                 <Button variant="ghost" @click="emit('close')">

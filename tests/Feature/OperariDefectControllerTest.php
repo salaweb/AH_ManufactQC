@@ -46,3 +46,30 @@ it('links a defect to the answer that triggered it', function () {
     $response->assertCreated();
     expect(Defect::first()->answer_id)->toBe($answer->id);
 });
+
+it('updates an existing defect, even after the answer it belongs to has changed to something else', function () {
+    $equipment = Equipment::factory()->create();
+    $answer = Answer::factory()->create(['equipment_id' => $equipment->id, 'response' => 'yes']);
+    $defect = Defect::factory()->create([
+        'equipment_id' => $equipment->id,
+        'answer_id' => $answer->id,
+        'tipo' => 'visual',
+        'observation' => 'Original',
+        'actions' => 'Original actions',
+    ]);
+
+    $response = $this->putJson("/operari/api/defects/{$defect->id}", [
+        'tipo' => 'dimensional',
+        'observation' => 'Updated observation',
+        'responsibility' => 'disseny',
+        'actions' => 'Updated actions',
+    ]);
+
+    $response->assertOk();
+    $defect->refresh();
+    expect($defect->tipo)->toBe('dimensional')
+        ->and($defect->observation)->toBe('Updated observation')
+        ->and($defect->responsibility)->toBe('disseny')
+        ->and($defect->actions)->toBe('Updated actions')
+        ->and($defect->answer_id)->toBe($answer->id);
+});

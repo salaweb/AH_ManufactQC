@@ -39,6 +39,8 @@
     },
     "defect": {
         "title": "Registrar defecto",
+        "edit_title": "Editar defecto",
+        "edit": "Editar",
         "type": "Tipo",
         "observation": "Observación",
         "responsibility": "Responsabilidad",

@@ -32,9 +32,10 @@ const project = ref(null);
 const sections = ref([]);
 const answers = reactive({});
 const savedAnswerIds = reactive({});
+const questionDefects = reactive({});
 const observations = ref('');
 
-const defectModal = reactive({ open: false, questionId: null, answerId: null });
+const defectModal = reactive({ open: false, questionId: null, answerId: null, editingDefect: null });
 const photosModal = reactive({ open: false });
 
 let observationsTimer = null;
@@ -51,12 +52,15 @@ async function load() {
         for (const question of section.questions) {
             if (question.answer) {
                 answers[question.id] = question.answer.response;
+                savedAnswerIds[question.id] = question.answer.id;
+                questionDefects[question.id] = question.answer.defects ?? [];
             }
         }
     }
 }
 
 async function answerQuestion(question, response) {
+    const previousResponse = answers[question.id];
     answers[question.id] = response;
 
     const answer = await api.post('/operari/api/answers', {
@@ -68,11 +72,31 @@ async function answerQuestion(question, response) {
 
     savedAnswerIds[question.id] = answer.id;
 
-    if (response === 'defect') {
-        defectModal.questionId = question.id;
-        defectModal.answerId = answer.id;
-        defectModal.open = true;
+    if (response === 'defect' && previousResponse !== 'defect') {
+        openDefectModal(question);
     }
+}
+
+function openDefectModal(question) {
+    defectModal.questionId = question.id;
+    defectModal.answerId = savedAnswerIds[question.id];
+    defectModal.editingDefect = null;
+    defectModal.open = true;
+}
+
+function editDefect(question, defect) {
+    defectModal.questionId = question.id;
+    defectModal.answerId = savedAnswerIds[question.id];
+    defectModal.editingDefect = defect;
+    defectModal.open = true;
+}
+
+function onDefectSaved(defect) {
+    const questionId = defectModal.questionId;
+    const existing = questionDefects[questionId] ?? [];
+    const index = existing.findIndex((item) => item.id === defect.id);
+
+    questionDefects[questionId] = index === -1 ? [...existing, defect] : existing.map((item, i) => (i === index ? defect : item));
 }
 
 function saveObservations() {
@@ -124,6 +148,34 @@ onMounted(load);
                             :model-value="answers[question.id] ?? null"
                             @update:model-value="(value) => answerQuestion(question, value)"
                         />
+
+                        <div
+                            v-if="questionDefects[question.id]?.length"
+                            class="space-y-2 rounded border border-red-200 bg-red-50 p-3"
+                        >
+                            <div
+                                v-for="defect in questionDefects[question.id]"
+                                :key="defect.id"
+                                class="space-y-0.5 text-sm text-gray-700"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <p class="font-medium">{{ t(`defect.type_${defect.tipo}`) }}</p>
+                                    <Button variant="ghost" @click="editDefect(question, defect)">
+                                        {{ t('defect.edit') }}
+                                    </Button>
+                                </div>
+                                <p v-if="defect.observation">{{ defect.observation }}</p>
+                                <p v-if="defect.responsibility" class="text-gray-500">
+                                    {{ t('defect.responsibility') }}: {{ t(`defect.responsibility_${defect.responsibility}`) }}
+                                </p>
+                                <p v-if="defect.actions" class="font-medium text-green-700">
+                                    {{ t('defect.actions') }}: {{ defect.actions }}
+                                </p>
+                            </div>
+                            <Button v-if="answers[question.id] === 'defect'" variant="outline" @click="openDefectModal(question)">
+                                {{ t('defect.add_another') }}
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -151,8 +203,9 @@ onMounted(load);
         :open="defectModal.open"
         :equipment-id="equipmentId"
         :answer-id="defectModal.answerId"
+        :editing-defect="defectModal.editingDefect"
         @close="defectModal.open = false"
-        @saved="() => {}"
+        @saved="onDefectSaved"
     />
 
     <PhotosModal

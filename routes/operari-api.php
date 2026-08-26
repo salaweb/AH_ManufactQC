@@ -14,3 +14,4 @@ Route::post('/equipment/{equipment}/photos', [EquipmentController::class, 'store
 
 Route::post('/answers', [AnswerController::class, 'store']);
 Route::post('/defects', [DefectController::class, 'store']);
+Route::put('/defects/{defect}', [DefectController::class, 'update']);
