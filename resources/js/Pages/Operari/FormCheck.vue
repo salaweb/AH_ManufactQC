@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
 import OperariNav from '../../Components/OperariNav.vue';
@@ -37,6 +37,7 @@ const observations = ref('');
 
 const defectModal = reactive({ open: false, questionId: null, answerId: null, editingDefect: null });
 const photosModal = reactive({ open: false });
+const pendingMutations = ref(0);
 
 let observationsTimer = null;
 
@@ -60,6 +61,16 @@ async function load() {
 }
 
 async function answerQuestion(question, response) {
+    pendingMutations.value++;
+
+    try {
+        await answerQuestionRequest(question, response);
+    } finally {
+        pendingMutations.value--;
+    }
+}
+
+async function answerQuestionRequest(question, response) {
     const previousResponse = answers[question.id];
     answers[question.id] = response;
 
@@ -108,6 +119,22 @@ function onDefectSaved(defect) {
     const index = existing.findIndex((item) => item.id === defect.id);
 
     questionDefects[questionId] = index === -1 ? [...existing, defect] : existing.map((item, i) => (i === index ? defect : item));
+}
+
+async function deleteDefect(question, defect) {
+    if (!confirm(t('defect.delete_confirm'))) {
+        return;
+    }
+
+    pendingMutations.value++;
+
+    try {
+        await api.delete(`/operari/api/defects/${defect.id}`);
+
+        questionDefects[question.id] = (questionDefects[question.id] ?? []).filter((item) => item.id !== defect.id);
+    } finally {
+        pendingMutations.value--;
+    }
 }
 
 function saveObservations() {
@@ -171,9 +198,14 @@ onMounted(load);
                             >
                                 <div class="flex items-center justify-between">
                                     <p class="font-medium">{{ t(`defect.type_${defect.tipo}`) }}</p>
-                                    <Button variant="ghost" @click="editDefect(question, defect)">
-                                        {{ t('defect.edit') }}
-                                    </Button>
+                                    <div class="flex gap-1">
+                                        <Button variant="ghost" @click="editDefect(question, defect)">
+                                            {{ t('defect.edit') }}
+                                        </Button>
+                                        <Button variant="ghost-danger" @click="deleteDefect(question, defect)">
+                                            {{ t('defect.delete') }}
+                                        </Button>
+                                    </div>
                                 </div>
                                 <p v-if="defect.observation">{{ defect.observation }}</p>
                                 <p v-if="defect.responsibility" class="text-gray-500">
@@ -204,9 +236,15 @@ onMounted(load);
                 />
             </div>
 
-            <Button class="w-full" @click="openFinish">
+            <Button class="w-full" :disabled="pendingMutations > 0" @click="openFinish">
                 {{ t('form.finish') }}
             </Button>
+            <Link
+                :href="`/operari/order-fabrications/${equipment.order_fabrication_id}/equipment-list`"
+                class="block text-center text-sm text-gray-500 hover:text-gray-700"
+            >
+                ← {{ t('common.back') }}
+            </Link>
         </div>
     </div>
 
@@ -222,6 +260,7 @@ onMounted(load);
     <PhotosModal
         :open="photosModal.open"
         :equipment-id="equipmentId"
+        @close="photosModal.open = false"
         @finished="onFinished"
     />
 </template>

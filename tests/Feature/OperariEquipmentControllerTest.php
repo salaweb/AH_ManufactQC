@@ -147,6 +147,64 @@ it('finalizes equipment as ok when it has observations but no defects, since obs
     expect($equipment->fresh()->status)->toBe(EquipmentStatus::Ok);
 });
 
+it('refuses to finalize when a required question has not been answered', function () {
+    Storage::fake('photos');
+    $equipment = Equipment::factory()->create();
+    $section = Section::factory()->create();
+    $equipment->project->sections()->attach($section);
+    Question::factory()->create(['section_id' => $section->id, 'is_required' => true]);
+
+    $response = $this->postJson("/operari/api/equipment/{$equipment->id}/photos", []);
+
+    $response->assertUnprocessable();
+    expect($equipment->fresh()->checked_at)->toBeNull();
+});
+
+it('refuses to finalize when a question is answered as defect but has no recorded defect', function () {
+    Storage::fake('photos');
+    $equipment = Equipment::factory()->create();
+    $section = Section::factory()->create();
+    $equipment->project->sections()->attach($section);
+    $question = Question::factory()->create(['section_id' => $section->id, 'is_required' => true]);
+    Answer::factory()->create([
+        'equipment_id' => $equipment->id,
+        'question_id' => $question->id,
+        'response' => 'defect',
+    ]);
+
+    $response = $this->postJson("/operari/api/equipment/{$equipment->id}/photos", []);
+
+    $response->assertUnprocessable();
+    expect($equipment->fresh()->checked_at)->toBeNull();
+});
+
+it('finalizes successfully once every required question has an answer', function () {
+    Storage::fake('photos');
+    $equipment = Equipment::factory()->create();
+    $section = Section::factory()->create();
+    $equipment->project->sections()->attach($section);
+    $question = Question::factory()->create(['section_id' => $section->id, 'is_required' => true]);
+    Answer::factory()->create(['equipment_id' => $equipment->id, 'question_id' => $question->id, 'response' => 'yes']);
+
+    $response = $this->postJson("/operari/api/equipment/{$equipment->id}/photos", []);
+
+    $response->assertOk();
+    expect($equipment->fresh()->checked_at)->not->toBeNull();
+});
+
+it('does not block finalizing on unanswered optional (non-required) questions', function () {
+    Storage::fake('photos');
+    $equipment = Equipment::factory()->create();
+    $section = Section::factory()->create();
+    $equipment->project->sections()->attach($section);
+    Question::factory()->create(['section_id' => $section->id, 'is_required' => false]);
+
+    $response = $this->postJson("/operari/api/equipment/{$equipment->id}/photos", []);
+
+    $response->assertOk();
+    expect($equipment->fresh()->checked_at)->not->toBeNull();
+});
+
 it('allows finishing without any photos, since they are optional', function () {
     Storage::fake('photos');
     $equipment = Equipment::factory()->create();

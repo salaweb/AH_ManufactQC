@@ -16,6 +16,7 @@ const { t } = useI18n();
 const files = ref([]);
 const previews = ref([]);
 const saving = ref(false);
+const error = ref('');
 
 function onFilesSelected(event) {
     const selected = Array.from(event.target.files ?? []).slice(0, 6);
@@ -25,6 +26,7 @@ function onFilesSelected(event) {
 
 async function finish() {
     saving.value = true;
+    error.value = '';
 
     try {
         const formData = new FormData();
@@ -33,6 +35,8 @@ async function finish() {
         const equipment = await api.postForm(`/operari/api/equipment/${props.equipmentId}/photos`, formData);
 
         emit('finished', equipment);
+    } catch (err) {
+        error.value = err.data?.message ?? t('photos.error');
     } finally {
         saving.value = false;
     }
@@ -56,9 +60,14 @@ async function finish() {
                 />
             </div>
 
+            <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+
             <div class="flex flex-col gap-2 pt-2">
                 <Button class="w-full" :disabled="saving" @click="finish">
                     {{ files.length ? t('photos.save') : t('photos.skip') }}
+                </Button>
+                <Button variant="ghost" @click="emit('close')">
+                    {{ t('photos.cancel') }}
                 </Button>
             </div>
         </div>

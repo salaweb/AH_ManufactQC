@@ -69,6 +69,18 @@ class EquipmentController extends Controller
 
     public function storePhotos(StorePhotosRequest $request, Equipment $equipment): JsonResponse
     {
+        if (! $equipment->isFullyAnswered()) {
+            return response()->json([
+                'message' => 'Falten preguntes obligatòries per respondre abans de finalitzar.',
+            ], 422);
+        }
+
+        if ($equipment->hasCurrentDefectAnswer()) {
+            return response()->json([
+                'message' => 'Hi ha alguna pregunta marcada com a Defecte. Canvia-la a Sí o No abans de finalitzar.',
+            ], 422);
+        }
+
         foreach ($request->file('photos', []) as $file) {
             $path = $file->store('', 'photos');
 

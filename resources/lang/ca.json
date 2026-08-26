@@ -41,6 +41,8 @@
         "title": "Registrar defecte",
         "edit_title": "Editar defecte",
         "edit": "Editar",
+        "delete": "Eliminar",
+        "delete_confirm": "Segur que vols eliminar aquest defecte?",
         "type": "Tipus",
         "observation": "Observació",
         "responsibility": "Responsabilitat",
@@ -60,7 +62,9 @@
         "subtitle": "Pots afegir entre 5 i 6 fotos (opcional)",
         "add": "Afegir fotos",
         "save": "Desa i finalitza",
-        "skip": "Finalitzar sense fotos"
+        "skip": "Finalitzar sense fotos",
+        "error": "No s'ha pogut finalitzar. Torna-ho a provar.",
+        "cancel": "Cancel·lar"
     },
     "list": {
         "title": "Números de sèrie",

@@ -16,3 +16,4 @@ Route::post('/answers', [AnswerController::class, 'store']);
 Route::delete('/answers/{answer}', [AnswerController::class, 'destroy']);
 Route::post('/defects', [DefectController::class, 'store']);
 Route::put('/defects/{defect}', [DefectController::class, 'update']);
+Route::delete('/defects/{defect}', [DefectController::class, 'destroy']);
