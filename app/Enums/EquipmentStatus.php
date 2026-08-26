@@ -5,7 +5,7 @@ namespace App\Enums;
 enum EquipmentStatus: string
 {
     case Pending = 'pending';
+    case PendingWithDefects = 'pending_defect';
     case Ok = 'ok';
-    case Defect = 'defect';
-    case Observation = 'observation';
+    case OkWithDefects = 'defect';
 }

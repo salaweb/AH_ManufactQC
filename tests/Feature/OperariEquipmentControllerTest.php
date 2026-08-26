@@ -126,7 +126,7 @@ it('finalizes equipment as ok when there are no defects and no observations', fu
     Storage::disk('photos')->assertExists($equipment->photos->first()->path);
 });
 
-it('finalizes equipment as defect when it has defects, even with photos', function () {
+it('finalizes equipment as ok-with-defects when it has defects, even with photos', function () {
     Storage::fake('photos');
     $equipment = Equipment::factory()->create();
     Defect::factory()->create(['equipment_id' => $equipment->id]);
@@ -134,17 +134,17 @@ it('finalizes equipment as defect when it has defects, even with photos', functi
     $response = $this->postJson("/operari/api/equipment/{$equipment->id}/photos", []);
 
     $response->assertOk();
-    expect($equipment->fresh()->status)->toBe(EquipmentStatus::Defect);
+    expect($equipment->fresh()->status)->toBe(EquipmentStatus::OkWithDefects);
 });
 
-it('finalizes equipment as observation when it has observations but no defects', function () {
+it('finalizes equipment as ok when it has observations but no defects, since observations no longer affect status', function () {
     Storage::fake('photos');
     $equipment = Equipment::factory()->create(['observations' => 'Detall a revisar en propera visita.']);
 
     $response = $this->postJson("/operari/api/equipment/{$equipment->id}/photos", []);
 
     $response->assertOk();
-    expect($equipment->fresh()->status)->toBe(EquipmentStatus::Observation);
+    expect($equipment->fresh()->status)->toBe(EquipmentStatus::Ok);
 });
 
 it('allows finishing without any photos, since they are optional', function () {

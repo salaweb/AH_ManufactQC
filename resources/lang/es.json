@@ -72,9 +72,9 @@
     },
     "status": {
         "pending": "Pendiente",
+        "pending_defect": "Pendiente con defectos",
         "ok": "Correcto",
-        "defect": "Con defectos",
-        "observation": "Con observaciones"
+        "defect": "Correcto con defectos"
     },
     "dashboard": {
         "title": "Dashboard Admin/QC",

@@ -48,4 +48,16 @@ class Equipment extends Model
     {
         return $this->hasMany(Photo::class);
     }
+
+    public function statusFor(bool $finished): EquipmentStatus
+    {
+        $hasDefects = $this->defects()->exists();
+
+        return match (true) {
+            $finished && $hasDefects => EquipmentStatus::OkWithDefects,
+            $finished => EquipmentStatus::Ok,
+            $hasDefects => EquipmentStatus::PendingWithDefects,
+            default => EquipmentStatus::Pending,
+        };
+    }
 }

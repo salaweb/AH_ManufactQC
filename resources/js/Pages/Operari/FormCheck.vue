@@ -63,6 +63,17 @@ async function answerQuestion(question, response) {
     const previousResponse = answers[question.id];
     answers[question.id] = response;
 
+    if (response === null) {
+        const answerId = savedAnswerIds[question.id];
+
+        if (answerId) {
+            await api.delete(`/operari/api/answers/${answerId}`);
+            delete savedAnswerIds[question.id];
+        }
+
+        return;
+    }
+
     const answer = await api.post('/operari/api/answers', {
         equipment_id: props.equipmentId,
         question_id: question.id,

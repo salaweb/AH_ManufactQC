@@ -45,3 +45,12 @@ it('updates the existing answer instead of duplicating it when answered again', 
         ->and(Answer::where('equipment_id', $equipment->id)->where('question_id', $question->id)->first()->response)
         ->toBe(AnswerResponse::Defect);
 });
+
+it('deletes an answer, so a question can be left unanswered again after clicking the same option twice', function () {
+    $answer = Answer::factory()->create();
+
+    $response = $this->deleteJson("/operari/api/answers/{$answer->id}");
+
+    $response->assertNoContent();
+    expect(Answer::find($answer->id))->toBeNull();
+});

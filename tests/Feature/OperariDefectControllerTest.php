@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\EquipmentStatus;
 use App\Models\Answer;
 use App\Models\Defect;
 use App\Models\Equipment;
@@ -72,4 +73,17 @@ it('updates an existing defect, even after the answer it belongs to has changed 
         ->and($defect->responsibility)->toBe('disseny')
         ->and($defect->actions)->toBe('Updated actions')
         ->and($defect->answer_id)->toBe($answer->id);
+});
+
+it('marks equipment as pending with defects as soon as a defect is recorded, before finishing the review', function () {
+    $equipment = Equipment::factory()->create();
+    expect($equipment->status)->toBe(EquipmentStatus::Pending);
+
+    $this->postJson('/operari/api/defects', [
+        'equipment_id' => $equipment->id,
+        'tipo' => 'visual',
+    ])->assertCreated();
+
+    expect($equipment->fresh()->status)->toBe(EquipmentStatus::PendingWithDefects)
+        ->and($equipment->fresh()->checked_at)->toBeNull();
 });

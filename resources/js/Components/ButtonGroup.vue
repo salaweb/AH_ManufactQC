@@ -1,11 +1,15 @@
 <script setup>
 import { useI18n } from 'vue-i18n';
 
-defineProps({
+const props = defineProps({
     modelValue: { type: String, default: null },
 });
 
 const emit = defineEmits(['update:modelValue']);
+
+function choose(value) {
+    emit('update:modelValue', props.modelValue === value ? null : value);
+}
 
 const { t } = useI18n();
 
@@ -24,7 +28,7 @@ const options = [
             type="button"
             class="flex-1 rounded px-3 py-2 text-sm font-medium text-white"
             :class="modelValue === option.value ? option.classes : 'bg-gray-200 !text-gray-700'"
-            @click="emit('update:modelValue', option.value)"
+            @click="choose(option.value)"
         >
             {{ option.label() }}
         </button>

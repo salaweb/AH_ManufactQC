@@ -72,9 +72,9 @@
     },
     "status": {
         "pending": "Pendent",
+        "pending_defect": "Pendent amb defectes",
         "ok": "Correcte",
-        "defect": "Amb defectes",
-        "observation": "Amb observacions"
+        "defect": "Correcte amb defectes"
     },
     "dashboard": {
         "title": "Dashboard Admin/QC",

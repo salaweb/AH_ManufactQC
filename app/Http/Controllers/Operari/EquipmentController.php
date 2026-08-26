@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Operari;
 
-use App\Enums\EquipmentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePhotosRequest;
 use App\Http\Requests\UpdateEquipmentObservationsRequest;
@@ -80,14 +79,8 @@ class EquipmentController extends Controller
             ]);
         }
 
-        $status = match (true) {
-            $equipment->defects()->exists() => EquipmentStatus::Defect,
-            filled($equipment->observations) => EquipmentStatus::Observation,
-            default => EquipmentStatus::Ok,
-        };
-
         $equipment->update([
-            'status' => $status,
+            'status' => $equipment->statusFor(finished: true),
             'checked_at' => now(),
         ]);
 

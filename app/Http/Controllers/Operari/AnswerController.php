@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAnswerRequest;
 use App\Models\Answer;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 class AnswerController extends Controller
 {
@@ -19,5 +20,12 @@ class AnswerController extends Controller
         );
 
         return response()->json($answer, 201);
+    }
+
+    public function destroy(Answer $answer): Response
+    {
+        $answer->delete();
+
+        return response()->noContent();
     }
 }

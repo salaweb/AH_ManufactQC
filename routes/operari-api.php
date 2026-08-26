@@ -13,5 +13,6 @@ Route::patch('/equipment/{equipment}', [EquipmentController::class, 'update']);
 Route::post('/equipment/{equipment}/photos', [EquipmentController::class, 'storePhotos']);
 
 Route::post('/answers', [AnswerController::class, 'store']);
+Route::delete('/answers/{answer}', [AnswerController::class, 'destroy']);
 Route::post('/defects', [DefectController::class, 'store']);
 Route::put('/defects/{defect}', [DefectController::class, 'update']);
