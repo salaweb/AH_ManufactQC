@@ -1,8 +1,9 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
-import { Link, router } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
+import AdminSidebar from '../../Components/AdminSidebar.vue';
 import FormField from '../../Components/FormField.vue';
 import Button from '../../Components/Button.vue';
 import { api } from '../../api';
@@ -84,13 +85,10 @@ onMounted(load);
 
 <template>
     <LanguageSelector />
+    <AdminSidebar />
 
-    <div class="min-h-screen bg-gray-50 px-4 py-10">
-        <div class="mx-auto max-w-3xl space-y-4">
-            <Link href="/admin/dashboard" class="text-sm text-gray-500 hover:text-gray-700">
-                ← {{ t('common.back') }}
-            </Link>
-
+    <div class="min-h-screen bg-gray-50 px-4 pb-10 pt-16">
+        <div class="mx-auto max-w-5xl space-y-4">
             <div class="flex items-center justify-between">
                 <h1 class="text-lg font-semibold text-gray-800">{{ t('admin_sections.title') }}</h1>
                 <Button @click="openCreate">
@@ -98,7 +96,7 @@ onMounted(load);
                 </Button>
             </div>
 
-            <div class="rounded-lg bg-white shadow">
+            <div class="overflow-x-auto rounded-lg bg-white shadow">
                 <table class="w-full text-left text-sm">
                     <thead>
                         <tr class="border-b text-gray-500">

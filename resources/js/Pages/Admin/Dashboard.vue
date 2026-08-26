@@ -1,13 +1,12 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue';
-import { Link, router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
+import AdminSidebar from '../../Components/AdminSidebar.vue';
 import StatCard from '../../Components/StatCard.vue';
 import ChartDefects from '../../Components/ChartDefects.vue';
 import PhotoGrid from '../../Components/PhotoGrid.vue';
 import FilterBar from '../../Components/FilterBar.vue';
-import Button from '../../Components/Button.vue';
 import { api } from '../../api';
 
 const { t } = useI18n();
@@ -51,10 +50,6 @@ async function loadDashboard() {
     recentPhotos.value = data.recent_photos;
 }
 
-function logout() {
-    router.post('/logout');
-}
-
 watch(filters, loadDashboard);
 
 onMounted(() => {
@@ -65,26 +60,11 @@ onMounted(() => {
 
 <template>
     <LanguageSelector />
+    <AdminSidebar />
 
-    <div class="min-h-screen bg-gray-50 px-4 py-10">
-        <div class="mx-auto max-w-4xl space-y-6">
-            <div class="flex items-center justify-between">
-                <h1 class="text-lg font-semibold text-gray-800">{{ t('dashboard.title') }}</h1>
-                <div class="flex items-center gap-4">
-                    <Link href="/admin/projects" class="text-sm text-gray-500 hover:text-gray-700">
-                        {{ t('admin_projects.title') }}
-                    </Link>
-                    <Link href="/admin/sections" class="text-sm text-gray-500 hover:text-gray-700">
-                        {{ t('admin_sections.title') }}
-                    </Link>
-                    <Link href="/admin/users" class="text-sm text-gray-500 hover:text-gray-700">
-                        {{ t('admin_users.title') }}
-                    </Link>
-                    <Button variant="ghost" @click="logout">
-                        {{ t('auth.logout') }}
-                    </Button>
-                </div>
-            </div>
+    <div class="min-h-screen bg-gray-50 px-4 pb-10 pt-16">
+        <div class="mx-auto max-w-6xl space-y-6">
+            <h1 class="text-lg font-semibold text-gray-800">{{ t('dashboard.title') }}</h1>
 
             <FilterBar v-model="filters" :projects="projects" />
 

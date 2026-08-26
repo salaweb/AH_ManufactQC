@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
-import { Link } from '@inertiajs/vue3';
 import { VueDraggable } from 'vue-draggable-plus';
 import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
+import AdminSidebar from '../../Components/AdminSidebar.vue';
 import Button from '../../Components/Button.vue';
 import { api } from '../../api';
 
@@ -94,13 +94,10 @@ onMounted(load);
 
 <template>
     <LanguageSelector />
+    <AdminSidebar />
 
-    <div class="min-h-screen bg-gray-50 px-4 py-10">
-        <div class="mx-auto max-w-3xl space-y-4">
-            <Link href="/admin/sections" class="text-sm text-gray-500 hover:text-gray-700">
-                ← {{ t('common.back') }}
-            </Link>
-
+    <div class="min-h-screen bg-gray-50 px-4 pb-10 pt-16">
+        <div class="mx-auto max-w-5xl space-y-4">
             <div class="flex items-center justify-between">
                 <h1 class="text-lg font-semibold text-gray-800">
                     {{ t('admin_questions.title') }} — {{ section?.name }}
@@ -110,34 +107,36 @@ onMounted(load);
                 </Button>
             </div>
 
-            <div class="rounded-lg bg-white shadow">
-                <div class="flex items-center gap-3 border-b px-4 py-2 text-sm text-gray-500">
-                    <span class="w-4"></span>
-                    <span class="flex-1">{{ t('admin_questions.text') }}</span>
-                    <span class="w-36">{{ t('admin_questions.category') }}</span>
-                    <span class="w-32"></span>
-                </div>
-                <VueDraggable
-                    v-model="questions"
-                    :animation="200"
-                    handle=".drag-handle"
-                    ghost-class="opacity-40"
-                    @end="onReorder"
-                >
-                    <div v-for="question in questions" :key="question.id" class="flex items-center gap-3 border-b px-4 py-2">
-                        <span class="drag-handle w-4 cursor-move text-gray-300">⠿</span>
-                        <span class="flex-1 text-sm font-medium">{{ question.text }}</span>
-                        <span class="w-36 text-sm text-gray-600">{{ t(`category.${question.category}`) }}</span>
-                        <span class="flex w-32 justify-end gap-2">
-                            <Button variant="ghost" @click="openEdit(question)">
-                                {{ t('admin_questions.edit') }}
-                            </Button>
-                            <Button variant="ghost-danger" @click="remove(question)">
-                                {{ t('admin_questions.delete') }}
-                            </Button>
-                        </span>
+            <div class="overflow-x-auto rounded-lg bg-white shadow">
+                <div class="min-w-[560px]">
+                    <div class="flex items-center gap-3 border-b px-4 py-2 text-sm text-gray-500">
+                        <span class="w-4"></span>
+                        <span class="flex-1">{{ t('admin_questions.text') }}</span>
+                        <span class="w-36">{{ t('admin_questions.category') }}</span>
+                        <span class="w-32"></span>
                     </div>
-                </VueDraggable>
+                    <VueDraggable
+                        v-model="questions"
+                        :animation="200"
+                        handle=".drag-handle"
+                        ghost-class="opacity-40"
+                        @end="onReorder"
+                    >
+                        <div v-for="question in questions" :key="question.id" class="flex items-center gap-3 border-b px-4 py-2">
+                            <span class="drag-handle w-4 cursor-move text-gray-300">⠿</span>
+                            <span class="flex-1 text-sm font-medium">{{ question.text }}</span>
+                            <span class="w-36 text-sm text-gray-600">{{ t(`category.${question.category}`) }}</span>
+                            <span class="flex w-32 justify-end gap-2">
+                                <Button variant="ghost" @click="openEdit(question)">
+                                    {{ t('admin_questions.edit') }}
+                                </Button>
+                                <Button variant="ghost-danger" @click="remove(question)">
+                                    {{ t('admin_questions.delete') }}
+                                </Button>
+                            </span>
+                        </div>
+                    </VueDraggable>
+                </div>
             </div>
         </div>
 

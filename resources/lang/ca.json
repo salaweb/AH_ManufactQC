@@ -4,7 +4,9 @@
         "es": "Castellà"
     },
     "common": {
-        "back": "Enrere"
+        "back": "Enrere",
+        "menu": "Menú",
+        "close": "Tancar"
     },
     "auth": {
         "admin_login_title": "Accés Administració / QC",

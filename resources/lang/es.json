@@ -4,7 +4,9 @@
         "es": "Castellano"
     },
     "common": {
-        "back": "Atrás"
+        "back": "Atrás",
+        "menu": "Menú",
+        "close": "Cerrar"
     },
     "auth": {
         "admin_login_title": "Acceso Administración / QC",
