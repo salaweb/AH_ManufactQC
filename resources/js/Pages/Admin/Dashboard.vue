@@ -7,6 +7,7 @@ import StatCard from '../../Components/StatCard.vue';
 import ChartDefects from '../../Components/ChartDefects.vue';
 import PhotoGrid from '../../Components/PhotoGrid.vue';
 import FilterBar from '../../Components/FilterBar.vue';
+import Button from '../../Components/Button.vue';
 import { api } from '../../api';
 
 const { t } = useI18n();
@@ -76,9 +77,9 @@ onMounted(() => {
                     <Link href="/admin/sections" class="text-sm text-gray-500 hover:text-gray-700">
                         {{ t('admin_sections.title') }}
                     </Link>
-                    <button type="button" class="text-sm text-gray-500" @click="logout">
+                    <Button variant="ghost" @click="logout">
                         {{ t('auth.logout') }}
-                    </button>
+                    </Button>
                 </div>
             </div>
 

@@ -4,6 +4,7 @@ import { Link } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
 import FormField from '../../Components/FormField.vue';
+import Button from '../../Components/Button.vue';
 import { api } from '../../api';
 
 const { t } = useI18n();
@@ -196,9 +197,9 @@ onMounted(load);
 
             <div class="flex items-center justify-between">
                 <h1 class="text-lg font-semibold text-gray-800">{{ t('admin_projects.title') }}</h1>
-                <button type="button" class="rounded bg-gray-800 px-4 py-2 text-sm text-white" @click="openCreate">
+                <Button @click="openCreate">
                     {{ t('admin_projects.add') }}
-                </button>
+                </Button>
             </div>
 
             <div class="rounded-lg bg-white shadow">
@@ -219,12 +220,12 @@ onMounted(load);
                                 {{ project.sections.map((s) => s.name).join(' ') }}
                             </td>
                             <td class="space-x-2 px-4 py-2 text-right">
-                                <button type="button" class="text-gray-500 hover:text-gray-800" @click="openEdit(project)">
+                                <Button variant="ghost" @click="openEdit(project)">
                                     {{ t('admin_projects.edit') }}
-                                </button>
-                                <button type="button" class="text-red-500 hover:text-red-700" @click="remove(project)">
+                                </Button>
+                                <Button variant="ghost-danger" @click="remove(project)">
                                     {{ t('admin_projects.delete') }}
-                                </button>
+                                </Button>
                             </td>
                         </tr>
                     </tbody>
@@ -257,9 +258,9 @@ onMounted(load);
                             class="flex-1 rounded border border-gray-300 px-2 py-1 text-sm"
                             @keydown.enter.prevent="addFamily"
                         />
-                        <button type="button" class="rounded border border-gray-300 px-2 text-sm text-gray-600" @click="addFamily">
+                        <Button variant="outline" @click="addFamily">
                             +
-                        </button>
+                        </Button>
                     </div>
                     <p v-if="newFamilyError" class="mt-1 text-sm text-red-600">{{ newFamilyError }}</p>
                 </div>
@@ -275,23 +276,21 @@ onMounted(load);
                         >
                             <span class="w-4 text-gray-400">{{ index + 1 }}</span>
                             <span class="flex-1 text-gray-700">{{ sectionName(id) }}</span>
-                            <button
-                                type="button"
-                                class="text-gray-400 disabled:opacity-30"
+                            <Button
+                                variant="ghost"
                                 :disabled="index === 0"
                                 @click="moveSectionUp(index)"
                             >
                                 ↑
-                            </button>
-                            <button
-                                type="button"
-                                class="text-gray-400 disabled:opacity-30"
+                            </Button>
+                            <Button
+                                variant="ghost"
                                 :disabled="index === form.section_ids.length - 1"
                                 @click="moveSectionDown(index)"
                             >
                                 ↓
-                            </button>
-                            <button type="button" class="text-red-500" @click="removeSelectedSection(id)">×</button>
+                            </Button>
+                            <Button variant="ghost-danger" @click="removeSelectedSection(id)">×</Button>
                         </li>
                     </ol>
 
@@ -325,9 +324,9 @@ onMounted(load);
                             class="flex-1 rounded border border-gray-300 px-2 py-1 text-sm"
                             @keydown.enter.prevent="addSection"
                         />
-                        <button type="button" class="rounded border border-gray-300 px-2 text-sm text-gray-600" @click="addSection">
+                        <Button variant="outline" @click="addSection">
                             +
-                        </button>
+                        </Button>
                     </div>
                     <p v-if="newSectionError" class="mt-1 text-sm text-red-600">{{ newSectionError }}</p>
                 </div>
@@ -338,17 +337,12 @@ onMounted(load);
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" class="text-sm text-gray-500" @click="closeForm">
+                    <Button variant="ghost" @click="closeForm">
                         {{ t('admin_projects.cancel') }}
-                    </button>
-                    <button
-                        type="button"
-                        class="rounded bg-gray-800 px-4 py-2 text-sm text-white disabled:opacity-40"
-                        :disabled="saving"
-                        @click="save"
-                    >
+                    </Button>
+                    <Button :disabled="saving" @click="save">
                         {{ t('admin_projects.save') }}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

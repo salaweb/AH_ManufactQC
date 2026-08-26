@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
 import OperariNav from '../../Components/OperariNav.vue';
 import ButtonGroup from '../../Components/ButtonGroup.vue';
+import Button from '../../Components/Button.vue';
 import DefectModal from './DefectModal.vue';
 import PhotosModal from './PhotosModal.vue';
 import { api } from '../../api';
@@ -140,9 +141,9 @@ onMounted(load);
                 />
             </div>
 
-            <button type="button" class="w-full rounded bg-gray-800 py-2 text-white" @click="openFinish">
+            <Button class="w-full" @click="openFinish">
                 {{ t('form.finish') }}
-            </button>
+            </Button>
         </div>
     </div>
 

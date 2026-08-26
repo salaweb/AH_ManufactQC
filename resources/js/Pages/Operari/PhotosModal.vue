@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import Button from '../../Components/Button.vue';
 import { api } from '../../api';
 
 const props = defineProps({
@@ -56,14 +57,9 @@ async function finish() {
             </div>
 
             <div class="flex flex-col gap-2 pt-2">
-                <button
-                    type="button"
-                    class="rounded bg-gray-800 py-2 text-sm font-medium text-white disabled:opacity-40"
-                    :disabled="saving"
-                    @click="finish"
-                >
+                <Button class="w-full" :disabled="saving" @click="finish">
                     {{ files.length ? t('photos.save') : t('photos.skip') }}
-                </button>
+                </Button>
             </div>
         </div>
     </div>

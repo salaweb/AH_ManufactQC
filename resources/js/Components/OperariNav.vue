@@ -1,6 +1,7 @@
 <script setup>
 import { Link, router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
+import Button from './Button.vue';
 
 defineProps({
     backHref: { type: String, default: null },
@@ -20,8 +21,8 @@ function logout() {
         </Link>
         <span v-else></span>
 
-        <button type="button" class="text-sm text-gray-500 hover:text-gray-700" @click="logout">
+        <Button variant="ghost" @click="logout">
             {{ t('auth.logout') }}
-        </button>
+        </Button>
     </div>
 </template>

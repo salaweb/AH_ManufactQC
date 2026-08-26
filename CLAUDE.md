@@ -1,153 +1,155 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Aquest fitxer dona indicacions a Claude Code (claude.ai/code) per treballar amb el codi d'aquest repositori.
 
-## Project status
+## Estat del projecte
 
-All 5 phases are done — 92/92 Pest tests + 9/9 Vitest tests passing. The full Operari flow and the Admin dashboard (with real seeded data, filters, chart table-view toggle) were both driven end-to-end in a real headless-Chromium browser with no console errors. There is no Fase 6 planned; further work is enhancement/maintenance on top of a complete spec, not phase-gated the way 1-5 were — still apply the golden rule (explain → wait for approval → implement) for anything nontrivial.
+Les 5 fases estan fetes — 92/92 tests de Pest + 9/9 tests de Vitest passen. Tant el flux complet d'Operari com el Dashboard d'Admin (amb dades reals sembrades, filtres, i el toggle taula/gràfic) s'han provat de cap a cap en un navegador real (headless-Chromium) sense errors de consola. No hi ha cap Fase 6 planificada; la feina que ve ara és millora/manteniment sobre una especificació completa, no per fases com la 1-5 — tot i així, segueix aplicant la regla d'or (explicar → esperar aprovació → implementar) per a qualsevol cosa que no sigui trivial.
 
-**Known real gap, partially closed, more to come:** there are still no Admin Vue pages to manage OrderFabrication/Equipment/User — `Admin/ProjectIndex.vue` and `Admin/SectionIndex.vue` (+ `Admin/QuestionIndex.vue` for a section's questions) exist so far (built one resource at a time, per the user's explicit "pas a pas" request; don't build the rest speculatively, wait to be asked). The JSON `/api/*` endpoints for all of them already exist and work; only the UI is missing. When asked to build the next one, follow `ProjectIndex.vue`'s pattern: a table + a modal add/edit form, reusing the existing `/api/*` CRUD.
+**Forat real conegut, parcialment tancat, en falta més:** encara no hi ha pàgines Vue d'Admin per gestionar OrderFabrication/Equipment/User — `Admin/ProjectIndex.vue` i `Admin/SectionIndex.vue` (+ `Admin/QuestionIndex.vue` per a les preguntes d'una secció) ja existeixen (construïdes un recurs cada vegada, seguint la petició explícita de l'usuari de fer-ho "pas a pas"; no construeixis la resta de manera especulativa, espera que t'ho demanin). Els endpoints JSON `/api/*` per a tots aquests ja existeixen i funcionen; només falta la interfície. Quan et demanin construir el següent, segueix el patró de `ProjectIndex.vue`: una taula + un formulari modal d'afegir/editar, reutilitzant el CRUD `/api/*` existent.
 
-**Core data model: a Section *is* a project's description word, and it carries its own checklist.** This took two iterations to land on. First pass: Section ↔ Project many-to-many (a project only uses a subset of the global Sections, not all of them — `project_section` pivot, `Project::sections()`/`Section::projects()`). Second pass — the important one: the user then revealed that what looked like a separate free-text "Descripció" field (their examples: "AH17DV2 TS USB") is *not* separate from Sections at all — each of those words (e.g. "AH17DX2") **is** a Section, and picking a project's description words *is* picking which Sections/checklists apply to it ("les seccions no han de sortir en el llistat ja que pertanyen a la descripció del projecte"). So there was a brief detour where a standalone `DescriptionTag` model existed — it was deleted; don't recreate it. There is exactly one concept here: **Section**, doing double duty as both the display word and the checklist owner.
+**Model de dades central: una Secció *és* una paraula de la descripció d'un projecte, i porta el seu propi qüestionari.** Calen dues iteracions per arribar-hi. Primer pas: relació N-a-N Secció ↔ Projecte (un projecte només fa servir un subconjunt de les Seccions globals, no totes — pivot `project_section`, `Project::sections()`/`Section::projects()`). Segon pas — el important: l'usuari va revelar que el que semblava un camp de text lliure separat "Descripció" (els seus exemples: "AH17DV2 TS USB") **no** és independent de les Seccions — cada una d'aquestes paraules (p. ex. "AH17DX2") **és** una Secció, i triar les paraules de descripció d'un projecte *és* triar quines Seccions/qüestionaris s'hi apliquen ("les seccions no han de sortir en el llistat ja que pertanyen a la descripció del projecte"). Per això hi va haver una breu desviació on va existir un model `DescriptionTag` independent — es va eliminar; no el tornis a crear. Aquí només hi ha un concepte: **Secció**, que fa doble feina com a paraula de visualització i com a propietària del qüestionari.
 
-Order matters for that combined description ("AH17DV2 TS USB" is a specific sequence, not alphabetical), and a flat checkbox list doesn't scale as the catalog grows ("si és checkbox així serà molt llarg"). So `project_section` carries an `order` column; `Project::sections()` is `withPivot('order')->orderByPivot('order')`; `Admin\ProjectController` has a private `syncSections()` that maps the incoming `section_ids` array's position to the pivot `order` (array order *is* the source of truth — the frontend must send them in the intended display order, not alphabetically). `ProjectIndex.vue`'s "Descripció" field is a search-to-add autocomplete (typing filters the `sections` catalog client-side, with an inline "+" to grow the catalog) plus an ordered `<ol>` of chips with ↑/↓/× controls — there is no separate "Seccions" checkbox block or table column anymore, this picker *is* the section picker.
+L'ordre importa en aquesta descripció combinada ("AH17DV2 TS USB" és una seqüència concreta, no alfabètica), i una llista plana de checkboxes no escala a mesura que el catàleg creix ("si és checkbox així serà molt llarg"). Per això `project_section` porta una columna `order`; `Project::sections()` és `withPivot('order')->orderByPivot('order')`; `Admin\ProjectController` té un mètode privat `syncSections()` que mapeja la posició de l'array `section_ids` rebut a l'`order` del pivot (l'ordre de l'array *és* la font de veritat — el frontend ha d'enviar-les en l'ordre de visualització desitjat, no alfabèticament). El camp "Descripció" de `ProjectIndex.vue` és un cercador-per-afegir amb autocompletar (escriure filtra el catàleg `sections` al client, amb un "+" per fer créixer el catàleg) més una `<ol>` ordenada de xips amb controls ↑/↓/× — ja no hi ha cap bloc de checkboxes "Seccions" ni columna de taula separada, aquest selector *és* el selector de seccions.
 
-**Questions have a fixed `category` (`App\Enums\QuestionCategory`: Estètica / FuncionalMecanica / Electrònica), and not every section needs all three** ("el 90% dels projectes sí, però algun no pot tenir la part electrònica"). `questions.category` is required (no "uncategorized" state), but a section simply has however many questions in whichever categories apply — there's no flag needed to "disable" a category, its absence from that section's questions is enough. `Operari\EquipmentController@show` returns each question with its `category`; `FormCheck.vue` groups them into subheaders per section, skipping empty categories. `Admin/QuestionIndex.vue` (reached by clicking a section in `Admin/SectionIndex.vue`) is where category gets set per question.
+**Les preguntes tenen una `category` fixa (`App\Enums\QuestionCategory`: Estètica / FuncionalMecanica / Electrònica), i no totes les seccions necessiten les tres** ("el 90% dels projectes sí, però algun no pot tenir la part electrònica"). `questions.category` és obligatòria (no existeix l'estat "sense categoria"), però una secció simplement té les preguntes que té en les categories que li apliquin — no cal cap indicador per "desactivar" una categoria, la seva absència entre les preguntes de la secció ja n'hi basta. `Operari\EquipmentController@show` retorna cada pregunta amb la seva `category`; `FormCheck.vue` les agrupa en subcapçaleres per secció, ometent les categories buides. `Admin/QuestionIndex.vue` (s'hi arriba clicant una secció a `Admin/SectionIndex.vue`) és on es defineix la categoria de cada pregunta.
 
-Question order within a section is set by **dragging rows**, not a manual number field — a drop calls `POST /api/sections/{section}/questions/reorder` with the full ordered `question_ids` array; `Admin\QuestionController@reorder` maps array position straight to each question's `order` column in one pass, validating every ID actually belongs to that section first. New questions are appended at the end (`order: questions.length` at create time) rather than asking the user to type a number.
+L'ordre de les preguntes dins d'una secció es defineix **arrossegant les files**, no amb un camp numèric manual — deixar anar una fila crida `POST /api/sections/{section}/questions/reorder` amb l'array complet i ordenat `question_ids`; `Admin\QuestionController@reorder` mapeja directament la posició de l'array a la columna `order` de cada pregunta en un sol pas, validant primer que cada ID pertany realment a aquesta secció. Les preguntes noves s'afegeixen al final (`order: questions.length` en el moment de crear-les) en lloc de demanar a l'usuari que escrigui un número.
 
-The drag itself uses **`vue-draggable-plus`** (a SortableJS wrapper), not hand-rolled HTML5 `draggable`/`dragover` — a first attempt at doing this by hand only shifted the exact row under the pointer, not every row between drag source and target, which the user caught immediately ("nomes es mou el primer o l'últim"). Don't reach for classic `vuedraggable` (the older SortableJS/Vue.Draggable wrapper) if this comes up again elsewhere — its `main`/`module` fields both point at UMD builds with no real ESM entry, which made Vite fail to dedupe Vue and roughly doubled `app.js`'s bundle size; `vue-draggable-plus` has a proper ESM `exports` map and its SortableJS payload stays scoped to the one page's own chunk instead of leaking into the shared bundle.
+L'arrossegar en si fa servir **`vue-draggable-plus`** (un embolcall de SortableJS), no un `draggable`/`dragover` d'HTML5 fet a mà — un primer intent fet a mà només desplaçava la fila exacta sota el punter, no totes les files entre l'origen i el destí de l'arrossegament, cosa que l'usuari va detectar de seguida ("nomes es mou el primer o l'últim"). No facis servir el `vuedraggable` clàssic (l'embolcall més antic de SortableJS/Vue.Draggable) si això torna a sortir en un altre lloc — els seus camps `main`/`module` apunten tots dos a builds UMD sense cap entrada ESM real, cosa que feia que Vite no pogués deduplicar Vue i gairebé doblava la mida del paquet `app.js`; `vue-draggable-plus` té un `exports` d'ESM correcte i el seu pes de SortableJS es queda dins del chunk propi d'aquesta pàgina en lloc d'escapar-se cap al paquet compartit.
 
-Family stayed a separate, simpler concept: single choice per project (`Family` model, `projects.family_id` FK, required), same "+"-to-grow-the-catalog UI pattern as Sections, backed by `Admin\FamilyController` (`index`/`store`/`destroy` only). `FamilyController@destroy` blocks deleting a family still in use by a project (422, not a DB constraint crash). The real known catalog values the user gave (`FamilySeeder`, and the component-code Sections seeded in `ProjectSeeder`) are partial lists ("no tota la llista") — expect more to be added ad hoc through the UI, don't treat them as exhaustive. `ProjectFactory`/`FamilyFactory` generate synthetic unique values (not the real catalog words) specifically so tests creating many records in a loop don't exhaust a small faker pool and hit the DB unique constraint.
+La Família es va quedar com un concepte separat i més simple: una única opció per projecte (model `Family`, FK `projects.family_id`, obligatòria), amb el mateix patró d'interfície "+"-per-fer-créixer-el-catàleg que les Seccions, gestionat per `Admin\FamilyController` (només `index`/`store`/`destroy`). `FamilyController@destroy` bloqueja eliminar una família que encara estigui en ús per algun projecte (422, no un error de restricció de BD). Els valors reals del catàleg que l'usuari va donar (`FamilySeeder`, i les Seccions amb codi de component sembrades a `ProjectSeeder`) són llistes parcials ("no tota la llista") — cal esperar que se n'afegeixin més sobre la marxa des de la interfície, no tractar-les com a exhaustives. `ProjectFactory`/`FamilyFactory` generen valors únics sintètics (no les paraules reals del catàleg) precisament perquè els tests que creen molts registres en un bucle no esgotin un conjunt petit de dades de prova i topin amb la restricció d'unicitat de la BD.
 
-**Post-launch refinement (after the original 5 phases):** the user clarified the real Operari workflow after seeing it running — OF numbers are globally unique (format like `2026/01/0000123`, never repeated, not just unique per project) and an operari searches directly by OF number (not by project first). This changed: `order_fabrications.number` is now a plain global-unique column (was `unique(['project_id','number'])`); `Operari\ProjectController` (project-first search) was deleted and replaced by `Operari\OrderFabricationController@index` (`GET /operari/api/order-fabrications?q=`, returns OF rows with `project` eager-loaded); `Operari\EquipmentController@index`'s response shape changed from a bare array to `{ order_fabrication, equipment }` so `EquipmentList.vue` can show the project/OF header the user asked for ("ha de sortir el projecte que és"). `ProjectSelector.vue` is now a single OF-search box, not a two-step project→OF picker.
+**Refinament posterior al llançament (després de les 5 fases originals):** l'usuari va aclarir el flux real d'Operari després de veure'l funcionant — els números d'OF són únics a tota l'aplicació (format com `2026/01/0000123`, mai repetit, no només únic dins d'un projecte) i un operari cerca directament pel número d'OF (no pel projecte primer). Això va canviar: `order_fabrications.number` ara és una columna senzilla única globalment (abans era `unique(['project_id','number'])`); `Operari\ProjectController` (cerca primer-pel-projecte) es va eliminar i substituir per `Operari\OrderFabricationController@index` (`GET /operari/api/order-fabrications?q=`, retorna files d'OF amb `project` carregat); la forma de resposta de `Operari\EquipmentController@index` va canviar d'un array senzill a `{ order_fabrication, equipment }` perquè `EquipmentList.vue` pugui mostrar la capçalera de projecte/OF que l'usuari va demanar ("ha de sortir el projecte que és"). `ProjectSelector.vue` ara és una única caixa de cerca d'OF, no un selector en dos passos projecte→OF.
 
-Fase 3's `/api/*` routes live in `routes/api.php` but are loaded from `routes/web.php` via `Route::middleware(['auth', EnsureAdminOrQc::class])->prefix('api')->name('api.')->group(base_path('routes/api.php'))` — they run through the session-based `web` middleware stack, not Laravel's stateless `api` group, since auth here is sessions, not tokens. Fase 4 mirrors this pattern for Operari: `routes/operari-api.php`, loaded the same way but with `EnsureOperari::class` and prefix `operari/api`.
+Les rutes `/api/*` de la Fase 3 viuen a `routes/api.php` però es carreguen des de `routes/web.php` via `Route::middleware(['auth', EnsureAdminOrQc::class])->prefix('api')->name('api.')->group(base_path('routes/api.php'))` — passen per la pila de middleware `web` basada en sessió, no pel grup `api` sense estat de Laravel, ja que aquí l'autenticació és per sessions, no per tokens. La Fase 4 reflecteix aquest mateix patró per a Operari: `routes/operari-api.php`, carregat de la mateixa manera però amb `EnsureOperari::class` i el prefix `operari/api`.
 
-Fase 4 also had to extend Fase 3: the user decided OF and Equipment (serial numbers) must be pre-created by Admin/QC, not invented on the fly by an Operari — so `Admin\OrderFabricationController` and `Admin\EquipmentController` (+ their Store/Update requests) were added to `/api/*` alongside Project/Section/Question/User. Equipment's `status`/`checked_at` are never settable from that Admin CRUD — they're system-managed, only ever changed by the Operari check flow (`Operari\EquipmentController@storePhotos`, which computes `status` from whether the equipment has defects / non-empty observations, then stamps `checked_at`).
+La Fase 4 també va haver d'ampliar la Fase 3: l'usuari va decidir que l'OF i l'Equipment (números de sèrie) han de ser creats prèviament per Admin/QC, no inventats sobre la marxa per un Operari — així que `Admin\OrderFabricationController` i `Admin\EquipmentController` (+ les seves Store/Update requests) es van afegir a `/api/*` al costat de Project/Section/Question/User. `status`/`checked_at` de l'Equipment mai es poden establir des d'aquest CRUD d'Admin — són gestionats pel sistema, només canvien amb el flux de comprovació de l'Operari (`Operari\EquipmentController@storePhotos`, que calcula `status` segons si l'equipament té defectes / observacions no buides, i després estampa `checked_at`).
 
-Photo uploads use a dedicated `photos` filesystem disk (`config/filesystems.php`, root `storage/app/photos`, `serve => false` since these are private QC photos, not public assets) — not Laravel's default `local` disk, whose root is `storage/app/private` in this Laravel version, which doesn't match the spec's `storage/app/photos/` path.
+Les pujades de fotos fan servir un disc de fitxers dedicat `photos` (`config/filesystems.php`, arrel `storage/app/photos`, `serve => false` ja que són fotos privades de QC, no actius públics) — no el disc `local` per defecte de Laravel, l'arrel del qual és `storage/app/private` en aquesta versió de Laravel, que no coincideix amb el camí `storage/app/photos/` de l'especificació.
 
-Frontend API calls from Vue go through `resources/js/api.js`, a small `fetch()` wrapper (not axios — avoided adding it as a dependency) that reads the `XSRF-TOKEN` cookie and attaches it as `X-XSRF-TOKEN` so POST/PATCH/PUT/DELETE requests pass Laravel's CSRF check.
+Les crides API des de Vue passen per `resources/js/api.js`, un petit embolcall de `fetch()` (no axios — es va evitar afegir-lo com a dependència) que llegeix la cookie `XSRF-TOKEN` i l'adjunta com a `X-XSRF-TOKEN` perquè les peticions POST/PATCH/PUT/DELETE passin la comprovació CSRF de Laravel.
 
-**Navigation is a first-class concern the user twice caught missing — treat it as a requirement, not polish, on every new page.** `/` (`Welcome.vue`) is a real chooser (two buttons: Operari login, Admin/QC login), not a static placeholder. Every authenticated Operari page (`ProjectSelector`, `EquipmentList`, `FormCheck`) uses `Components/OperariNav.vue` (contextual "← Enrere" + always-present "Tancar sessió"); both login pages have a plain "← Enrere" `Link` to `/` (no logout there — not authenticated yet). `Admin/ProjectIndex.vue` has the same "← Enrere" back to `/admin/dashboard`, and the Dashboard links forward to it. When adding a new page reachable only by clicking through the app, always add its way back out — don't wait to be asked twice.
+**La navegació és una qüestió de primer ordre que l'usuari ha detectat que faltava dues vegades — tracta-la com un requisit, no com un acabat, a cada pàgina nova.** `/` (`Welcome.vue`) és un selector real (dos botons: login Operari, login Admin/QC), no un simple placeholder estàtic. Cada pàgina autenticada d'Operari (`ProjectSelector`, `EquipmentList`, `FormCheck`) fa servir `Components/OperariNav.vue` (un "← Enrere" contextual + un "Tancar sessió" sempre present); els dos formularis de login tenen un `Link` senzill "← Enrere" cap a `/` (sense tancar sessió allà — encara no estàs autenticat). `Admin/ProjectIndex.vue` té el mateix "← Enrere" cap a `/admin/dashboard`, i el Dashboard hi enllaça cap endavant. Quan afegeixis una pàgina nova a la qual només s'hi arriba fent clic dins l'aplicació, afegeix sempre la manera de tornar-ne a sortir — no esperis que t'ho demanin dues vegades.
 
-Fase 5's dashboard follows the `dataviz` skill's method: nominal-category bar charts (defects by tipo, by responsibility, defect-rate by section) are single-series so every bar uses the same categorical slot-1 blue (`#2a78d6` light / `#3987e5` dark) — per that skill, a single-series nominal chart never needs the multi-hue categorical rotation, that's reserved for genuinely distinct overlapping series. `ChartDefects.vue` is one generic reusable bar-chart component (props: `title`, `items`) driving all three charts, each with a table-view toggle for accessibility. `Admin\PhotoController@show` streams a photo through the private `photos` disk and returns 404 (not a 500) if the file is missing from disk — caught by an actual browser test where seeded demo `Photo` rows had no backing file.
+**Els botons genèrics d'acció passen per `Components/Button.vue`, no per `<button>` cru amb classes repetides.** L'usuari va detectar que cap botó de l'aplicació tenia efecte visual de "prement" — el primer intent va ser un pedaç global amb `@layer base` a `app.css` afegint `active:scale-95` a l'element `button`, però l'usuari ho va rebutjar explícitament ("vull que segueixis les bones pràctiques, no vull pedaços") i va demanar el component reutilitzable en el seu lloc. `Button.vue` centralitza l'efecte de pressió (`active:scale-95 active:brightness-95`, `hover:brightness-110`, transició) i cinc variants via prop `variant`: `primary` (sòlid fosc, l'acció principal — per defecte), `danger` (sòlid vermell, p. ex. "Desa defecte"), `outline` (amb vora, accions secundàries com els botons compactes "+" d'afegir al catàleg), `ghost` (text gris pla, p. ex. tancar sessió/cancel·lar/editar), `ghost-danger` (text vermell pla, p. ex. "Eliminar"). Es basa en el fallthrough d'atributs per defecte de Vue 3 (un únic `<button>` arrel, sense `inheritAttrs: false`) perquè `class`/`@click`/etc. passats pel pare s'apliquin automàticament a l'arrel — no cal reenviar-los a mà. Tots els botons d'acció genèrica de l'aplicació ja hi passen (logins, `OperariNav`, `FormCheck`, `DefectModal`, `PhotosModal`, i els tres CRUD d'Admin `ProjectIndex`/`SectionIndex`/`QuestionIndex`, incloent-hi els controls compactes ↑/↓/× de reordenació com a `ghost`/`ghost-danger`). **Deliberadament exclosos, no els converteixis:** `ButtonGroup.vue` (els botons Sí/No/Defecte codifiquen un estat seleccionat amb colors verd/gris/vermell lligats al valor de la resposta, no una acció genèrica), `ChartDefects.vue` (el seu botó de toggle fa servir CSS amb àmbit i variables de tema clar/fosc pròpies de l'skill `dataviz`; forçar-lo a `Button` li faria perdre la consciència de tema fosc) i `LanguageSelector.vue` (el mateix patró de control segmentat seleccionat/no-seleccionat que `ButtonGroup`, no un botó d'acció).
 
-Auth design actually implemented in Fase 2 (for reference, since it refines what the phase list below only sketches): a single `web` guard against the `users` table serves both login forms — Admin/QC via `email`, Operari via `username` — because a user only ever has one of the two set, so `Auth::attempt()` naturally can't cross-match; each controller still re-checks `role` after a successful attempt as defense in depth. Guests are redirected to the login form matching the area they hit (`operari.login` for `/operari*`, `login` otherwise) via `redirectGuestsTo` in `bootstrap/app.php`.
+El dashboard de la Fase 5 segueix el mètode de l'skill `dataviz`: els gràfics de barres de categoria nominal (defectes per tipo, per responsabilitat, taxa de defectes per secció) són de sèrie única, així que cada barra fa servir el mateix blau categòric de l'slot 1 (`#2a78d6` clar / `#3987e5` fosc) — segons aquest skill, un gràfic nominal d'una sola sèrie mai necessita la rotació categòrica multi-to, que es reserva per a sèries genuïnament diferents i superposades. `ChartDefects.vue` és un únic component de barres genèric i reutilitzable (props: `title`, `items`) que alimenta els tres gràfics, cadascun amb un toggle de vista-taula per accessibilitat. `Admin\PhotoController@show` serveix una foto a través del disc privat `photos` i retorna 404 (no un 500) si el fitxer no existeix al disc — detectat en un test de navegador real on les files `Photo` de demostració sembrades no tenien fitxer al darrere.
 
-## Project overview
+Disseny d'autenticació implementat realment a la Fase 2 (com a referència, ja que matisa el que la llista de fases més avall només esbossa): un únic guard `web` contra la taula `users` serveix els dos formularis de login — Admin/QC via `email`, Operari via `username` — perquè un usuari mai té els dos camps alhora, així que `Auth::attempt()` no es pot encreuar de manera natural; cada controller igualment torna a comprovar el `role` després d'un intent reeixit, com a defensa addicional. Els convidats es redirigeixen al formulari de login que correspon a l'àrea a la qual han accedit (`operari.login` per a `/operari*`, `login` en la resta de casos) via `redirectGuestsTo` a `bootstrap/app.php`.
 
-AH_ManufactQC is a digital quality-control system for manufacturing inspections. Operators (Operari) answer per-serial-number checklists, log defects with photos; QC/Admin manage the checklist questions and review dashboards/statistics.
+## Visió general del projecte
 
-Roles:
-- **Operari** — mobile/tablet frontend. Logs in with username+password. Answers checklists, marks defects, uploads 5-6 optional photos.
-- **Responsable QC** — web backend. Creates questions, views dashboard, reviews defects/statistics.
-- **Administrador** — web backend. Full CRUD, manages users and configuration.
+AH_ManufactQC és un sistema digital de control de qualitat per a inspeccions de fabricació. Els Operaris responen qüestionaris per número de sèrie, registren defectes amb fotos; QC/Admin gestionen les preguntes del qüestionari i revisen dashboards/estadístiques.
 
-Main flow: Operari login → select project/OF/serial number (entered manually, not sequential) → answer QUALITAT questions (Sí/No/Defecte) → defect popup (type, observation, responsibility, actions) if needed, multiple defects allowed per serial → free-text observations (optional) → photo popup (5-6 optional) → save sets `checked_at = NOW()` → serial number list shown color-coded (green/red/orange).
+Rols:
+- **Operari** — frontend mòbil/tablet. Inicia sessió amb usuari+contrasenya. Respon qüestionaris, marca defectes, puja 5-6 fotos opcionals.
+- **Responsable QC** — backend web. Crea preguntes, veu el dashboard, revisa defectes/estadístiques.
+- **Administrador** — backend web. CRUD complet, gestiona usuaris i configuració.
 
-## Golden rule: always ask before executing
+Flux principal: login Operari → selecciona projecte/OF/número de sèrie (entrat manualment, no seqüencial) → respon preguntes de QUALITAT (Sí/No/Defecte) → pop-up de defecte (tipus, observació, responsabilitat, accions) si cal, es permeten múltiples defectes per sèrie → observacions de text lliure (opcional) → pop-up de fotos (5-6 opcionals) → en desar s'estableix `checked_at = NOW()` → es mostra el llistat de números de sèrie amb colors (verd/vermell/taronja).
 
-Never implement or run code without explicit approval. Procedure for every unit of work:
-1. Explain what will be built.
-2. Wait for explicit approval (e.g. "Sí, crea...", "Implementa...").
-3. Implement and write verification tests alongside it.
-4. Confirm the tests pass before considering the work done.
+## Regla d'or: sempre preguntar abans d'executar
 
-## Tech stack
+Mai implementis ni executis codi sense aprovació explícita. Procediment per a cada unitat de feina:
+1. Explica què es construirà.
+2. Espera l'aprovació explícita (p. ex. "Sí, crea...", "Implementa...").
+3. Implementa-ho i escriu tests de verificació alhora.
+4. Confirma que els tests passen abans de donar la feina per acabada.
 
-- Backend: **Laravel 13.x** + Inertia.js (Inertia Laravel adapter v3) — note: the original project brief named Laravel 11, but 13.x is the current stable and was chosen deliberately when scaffolding; keep using 13.x going forward.
-- Frontend: Vue 3 + Vite + **Tailwind CSS v3** (not v4 — deliberately downgraded for stability; config lives in `tailwind.config.js` + `postcss.config.js`, classic `@tailwind base/components/utilities` directives in `resources/css/app.css`)
-- Database: SQLite (`database/database.sqlite`, `DB_CONNECTION=sqlite` already set in `.env`)
-- i18n: vue-i18n (Català + Castellà) — all user-visible text goes through `$t('key')`, keys defined in `resources/lang/ca.json` and `resources/lang/es.json`
-- Icons: `@lucide/vue` (the spec named `lucide-vue-next`, which is deprecated upstream in favor of this package — using the maintained one)
-- Testing: Pest 4 (backend, `./vendor/bin/pest`), Vitest (frontend) — every feature ships with tests, not optional
-- Auth: Laravel sessions (not JWT), multi-role — Admin/QC log in with email, Operari logs in with username
-- File storage: local disk at `storage/app/photos/`, not S3
+## Stack tecnològic
 
-## Code conventions
+- Backend: **Laravel 13.x** + Inertia.js (adaptador Inertia Laravel v3) — nota: l'especificació original del projecte deia Laravel 11, però la 13.x és l'estable actual i es va triar deliberadament en muntar l'estructura; continua fent servir la 13.x d'ara endavant.
+- Frontend: Vue 3 + Vite + **Tailwind CSS v3** (no v4 — es va rebaixar deliberadament per estabilitat; la configuració viu a `tailwind.config.js` + `postcss.config.js`, directives clàssiques `@tailwind base/components/utilities` a `resources/css/app.css`)
+- Base de dades: SQLite (`database/database.sqlite`, `DB_CONNECTION=sqlite` ja establert a `.env`)
+- i18n: vue-i18n (Català + Castellà) — tot el text visible per l'usuari passa per `$t('key')`, amb les claus definides a `resources/lang/ca.json` i `resources/lang/es.json`
+- Icones: `@lucide/vue` (l'especificació anomenava `lucide-vue-next`, que està obsolet a favor d'aquest paquet — es fa servir el que sí que es manté)
+- Testing: Pest 4 (backend, `./vendor/bin/pest`), Vitest (frontend) — cada funcionalitat es lliura amb tests, no és opcional
+- Auth: sessions de Laravel (no JWT), multi-rol — Admin/QC inicien sessió amb email, Operari amb usuari
+- Emmagatzematge de fitxers: disc local a `storage/app/photos/`, no S3
+
+## Convencions de codi
 
 **PHP**
 - Variables: `camelCase`
 - Classes: `PascalCase`
 - Constants: `SCREAMING_SNAKE_CASE`
-- All request validation goes through Form Requests — never validate inline in a controller
-- Models use Eloquent relationships (not raw queries) for associations
+- Tota la validació de peticions passa per Form Requests — mai validar en línia dins d'un controller
+- Els models fan servir relacions Eloquent (no consultes en cru) per a les associacions
 
 **Vue/JavaScript**
-- Components: `PascalCase` filenames
-- Variables and methods: `camelCase`
-- All visible text via `$t('key')`, never hardcoded strings
+- Components: noms de fitxer en `PascalCase`
+- Variables i mètodes: `camelCase`
+- Tot el text visible via `$t('key')`, mai cadenes de text fixades al codi
 
-## Required folder structure
+## Estructura de carpetes obligatòria
 
 ```
-app/Models/                    Eloquent models
-app/Http/Controllers/          Admin/ and Operari/ subfolders
-app/Http/Middleware/           Admin/ and Operari/ subfolders for role-guard middleware (e.g. Fase 2's
-                                EnsureAdminOrQc / EnsureOperari); NOT "Web/" — that collides with
-                                Laravel's own built-in "web" middleware group name, which is a
-                                different thing. Inertia's own HandleInertiaRequests stays directly
-                                under Middleware/ since it's global, not role-specific
-app/Http/Requests/             Form Requests (all validation)
+app/Models/                    Models Eloquent
+app/Http/Controllers/          Subcarpetes Admin/ i Operari/
+app/Http/Middleware/           Subcarpetes Admin/ i Operari/ per al middleware de guarda de rol (p. ex.
+                                EnsureAdminOrQc / EnsureOperari de la Fase 2); NO "Web/" — col·lisiona
+                                amb el nom del grup de middleware natiu de Laravel "web", que és una
+                                cosa diferent. El HandleInertiaRequests propi d'Inertia es queda
+                                directament sota Middleware/ ja que és global, no específic d'un rol
+app/Http/Requests/             Form Requests (tota la validació)
 database/migrations/
 database/factories/
 database/seeders/
-resources/js/Pages/            Operari/ and Admin/ Inertia pages
-resources/js/Components/       Reusable Vue components
-resources/js/__tests__/        Vitest specs, mirrors Pages/Components layout
+resources/js/Pages/            Pàgines Inertia dins Operari/ i Admin/
+resources/js/Components/       Components Vue reutilitzables
+resources/js/__tests__/        Specs de Vitest, reflecteix l'estructura de Pages/Components
 resources/lang/                ca.json, es.json
-tests/Feature/                 Pest feature tests
-storage/app/photos/            Uploaded equipment photos
+tests/Feature/                 Tests Feature de Pest
+storage/app/photos/            Fotos d'equipaments pujades
 ```
 
-## Domain concepts
+## Conceptes de domini
 
-| Concept | Definition |
+| Concepte | Definició |
 |---------|-----------|
-| Project | Number (e.g. 1400C0000.00), a single Family (DB2, DB3, growable catalog), an ordered set of Sections that double as its combined description ("AH17DX2 TS USB"), global observations |
-| OF (OrderFabrication) | Manufacturing order, groups serial numbers |
-| Equipment | Serial number, entered manually (not sequential), belongs to a Project + OF |
-| Section | Both a project's description word *and* a checklist owner (e.g. "AH17DX2", or the generic "QUALITAT") — a growable catalog, picked per-project with an explicit order |
-| Question | A Sí/No/Defecte question belonging to a Section, tagged with a `category` (Estètica / Funcional-Mecànica / Electrònica) |
-| Defect | tipo + observation + responsibility + actions, tied to an Equipment |
-| Photo | Up to 5-6 optional photos per Equipment, taken when marked OK |
-| checked_at | Timestamp set when an Equipment is marked OK |
+| Project | Número (p. ex. 1400C0000.00), una única Família (DB2, DB3, catàleg extensible), un conjunt ordenat de Seccions que alhora formen la seva descripció combinada ("AH17DX2 TS USB"), observacions globals |
+| OF (OrderFabrication) | Ordre de fabricació, agrupa números de sèrie |
+| Equipment | Número de sèrie, entrat manualment (no seqüencial), pertany a un Project + OF |
+| Section | Alhora una paraula de la descripció d'un projecte *i* propietària d'un qüestionari (p. ex. "AH17DX2", o la genèrica "QUALITAT") — un catàleg extensible, triat per projecte amb un ordre explícit |
+| Question | Una pregunta Sí/No/Defecte que pertany a una Section, etiquetada amb una `category` (Estètica / Funcional-Mecànica / Electrònica) |
+| Defect | tipo + observació + responsabilitat + accions, lligat a un Equipment |
+| Photo | Fins a 5-6 fotos opcionals per Equipment, preses quan es marca com a OK |
+| checked_at | Marca de temps establerta quan un Equipment es marca com a OK |
 
-## Implementation phases
+## Fases d'implementació
 
-Work proceeds strictly in this order; each phase needs its own tests passing and explicit user go-ahead before starting the next.
+La feina avança estrictament en aquest ordre; cada fase necessita els seus propis tests passant i el vist-i-plau explícit de l'usuari abans de començar la següent.
 
-1. **Setup Inicial** — DONE. Models, migrations, factories, seeders (User, Project, Section, Question, OrderFabrication, Equipment, Answer, Defect, Photo), base Pest tests (`DatabaseSeederTest`, `ModelRelationshipsTest`).
-2. **Autenticació multi-rol** — DONE. `Admin\EnsureAdminOrQc` + `Operari\EnsureOperari` middleware, `AuthController` (Admin/QC, email) + `Operari\LoginController` (username), `LoginRequest`/`OperariLoginRequest`, `AuthenticationTest`, `AuthorizationTest`. Also created bare placeholder pages `Auth/Login.vue`, `Operari/Login.vue`, `Admin/Dashboard.vue`, `Operari/ProjectSelector.vue` — functional but unstyled/no i18n, since real UI is Fase 4/5 scope; don't be surprised they already exist when starting those phases, just style/wire them properly instead of recreating.
-3. **Backend CRUD (Admin/QC)** — DONE. `Admin\{Project,Section,Question,User}Controller` (index/store/show/update/destroy, JSON), Store+Update Form Request pair for all four resources (not just Project — extended past the original spec for consistency, see "Golden rule" note above), `/api/*` routes (see status note above), one Pest test file per controller. `UserController` nulls out `email` for operari and `username` for admin/qc, and relies on `User`'s `'hashed'` cast to hash passwords (no manual `Hash::make()` needed — it self-detects already-hashed values via `Hash::isHashed()`).
-4. **Frontend Operari** — DONE. `Operari/{Login,ProjectSelector,FormCheck,DefectModal,PhotosModal,EquipmentList}.vue`, `Components/{LanguageSelector,FormField,ButtonGroup}.vue`, `resources/lang/{ca,es}.json` + `resources/js/i18n.js` (vue-i18n, locale persisted to `localStorage` under key `ah_manufactqc_locale`), `resources/js/api.js` fetch helper, backend extensions described in the status note above, Vitest specs for `Login`, `FormCheck`, `LanguageSelector`. Navigation: `/operari` (ProjectSelector) → `/operari/order-fabrications/{of}/equipment-list` (EquipmentList, doubles as both the serial-picker and the post-check colored summary) → `/operari/equipment/{equipment}/check` (FormCheck, embeds DefectModal/PhotosModal) → back to EquipmentList on finish.
-5. **Dashboard QC + i18n complet** — DONE. `Admin\DashboardController@index` (one endpoint, `stats`/`defects_by_type`/`responsibilities`/`trends`/`recent_photos`, filterable by `project_id`/`from`/`to`), `Admin\PhotoController@show` (serves a photo file, 404 if missing), `Admin/Dashboard.vue` + `StatCard`/`ChartDefects`/`PhotoGrid`/`FilterBar` components (dataviz-skill compliant, see status note above), `dashboard.*` i18n keys in both languages plus an automated ca/es key-parity test (`i18n-parity.spec.js`), `DashboardControllerTest`, `PhotoControllerTest`, `Dashboard.spec.js`.
+1. **Setup Inicial** — FET. Models, migracions, factories, seeders (User, Project, Section, Question, OrderFabrication, Equipment, Answer, Defect, Photo), tests base de Pest (`DatabaseSeederTest`, `ModelRelationshipsTest`).
+2. **Autenticació multi-rol** — FET. Middleware `Admin\EnsureAdminOrQc` + `Operari\EnsureOperari`, `AuthController` (Admin/QC, email) + `Operari\LoginController` (usuari), `LoginRequest`/`OperariLoginRequest`, `AuthenticationTest`, `AuthorizationTest`. També es van crear pàgines placeholder bàsiques `Auth/Login.vue`, `Operari/Login.vue`, `Admin/Dashboard.vue`, `Operari/ProjectSelector.vue` — funcionals però sense estil ni i18n, ja que la interfície real és àmbit de la Fase 4/5; no et sorprenguis que ja existeixin en començar aquelles fases, només cal estilitzar-les i connectar-les bé en lloc de tornar-les a crear.
+3. **Backend CRUD (Admin/QC)** — FET. `Admin\{Project,Section,Question,User}Controller` (index/store/show/update/destroy, JSON), parella de Form Request Store+Update per als quatre recursos (no només Project — es va ampliar més enllà de l'especificació original per coherència, vegeu la nota de la "Regla d'or" més amunt), rutes `/api/*` (vegeu la nota d'estat més amunt), un fitxer de test de Pest per controller. `UserController` posa a `null` l'`email` per a operari i el `username` per a admin/qc, i confia en el cast `'hashed'` de `User` per xifrar contrasenyes (no cal `Hash::make()` manual — detecta sol els valors ja xifrats via `Hash::isHashed()`).
+4. **Frontend Operari** — FET. `Operari/{Login,ProjectSelector,FormCheck,DefectModal,PhotosModal,EquipmentList}.vue`, `Components/{LanguageSelector,FormField,ButtonGroup}.vue`, `resources/lang/{ca,es}.json` + `resources/js/i18n.js` (vue-i18n, idioma persistit a `localStorage` sota la clau `ah_manufactqc_locale`), helper `resources/js/api.js`, ampliacions de backend descrites a la nota d'estat més amunt, specs de Vitest per a `Login`, `FormCheck`, `LanguageSelector`. Navegació: `/operari` (ProjectSelector) → `/operari/order-fabrications/{of}/equipment-list` (EquipmentList, fa doble funció de selector de sèrie i de resum final acolorit) → `/operari/equipment/{equipment}/check` (FormCheck, incrusta DefectModal/PhotosModal) → torna a EquipmentList en acabar.
+5. **Dashboard QC + i18n complet** — FET. `Admin\DashboardController@index` (un sol endpoint, `stats`/`defects_by_type`/`responsibilities`/`trends`/`recent_photos`, filtrable per `project_id`/`from`/`to`), `Admin\PhotoController@show` (serveix un fitxer de foto, 404 si no existeix), `Admin/Dashboard.vue` + components `StatCard`/`ChartDefects`/`PhotoGrid`/`FilterBar` (compleixen l'skill de dataviz, vegeu la nota d'estat més amunt), claus i18n `dashboard.*` en tots dos idiomes més un test automàtic de paritat de claus ca/es (`i18n-parity.spec.js`), `DashboardControllerTest`, `PhotoControllerTest`, `Dashboard.spec.js`.
 
-## Commands
+## Comandes
 
 ```bash
-# Servers
+# Servidors
 php artisan serve                    # Backend, port 8000
-npm run dev                          # Vite frontend
+npm run dev                          # Frontend Vite
 
-# Database
+# Base de dades
 php artisan migrate
 php artisan migrate:fresh --seed
 php artisan tinker
 
 # Tests
-./vendor/bin/pest                    # All Pest tests
-./vendor/bin/pest tests/Feature      # Feature tests only
-./vendor/bin/pest --filter=some_test_name   # Single test
-npx vitest run                       # All Vitest tests once
-npx vitest                           # Vitest watch mode
+./vendor/bin/pest                    # Tots els tests de Pest
+./vendor/bin/pest tests/Feature      # Només els Feature tests
+./vendor/bin/pest --filter=some_test_name   # Un sol test
+npx vitest run                       # Tots els tests de Vitest, un cop
+npx vitest                           # Vitest en mode watch
 
-# Formatting
+# Formatació
 ./vendor/bin/pint                    # PHP
 
-# Production build
+# Build de producció
 npm run build
 php artisan cache:clear
 php artisan config:cache

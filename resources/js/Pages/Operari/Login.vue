@@ -3,6 +3,7 @@ import { Link, useForm } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
 import FormField from '../../Components/FormField.vue';
+import Button from '../../Components/Button.vue';
 
 const { t } = useI18n();
 
@@ -33,9 +34,9 @@ function submit() {
 
             <FormField v-model="form.password" type="password" :label="t('auth.password')" />
 
-            <button type="submit" class="w-full rounded bg-gray-800 py-2 text-white" :disabled="form.processing">
+            <Button type="submit" class="w-full" :disabled="form.processing">
                 {{ t('auth.submit') }}
-            </button>
+            </Button>
         </form>
     </div>
 </template>

@@ -4,6 +4,7 @@ import { Link, router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
 import FormField from '../../Components/FormField.vue';
+import Button from '../../Components/Button.vue';
 import { api } from '../../api';
 
 const { t } = useI18n();
@@ -92,9 +93,9 @@ onMounted(load);
 
             <div class="flex items-center justify-between">
                 <h1 class="text-lg font-semibold text-gray-800">{{ t('admin_sections.title') }}</h1>
-                <button type="button" class="rounded bg-gray-800 px-4 py-2 text-sm text-white" @click="openCreate">
+                <Button @click="openCreate">
                     {{ t('admin_sections.add') }}
-                </button>
+                </Button>
             </div>
 
             <div class="rounded-lg bg-white shadow">
@@ -115,15 +116,15 @@ onMounted(load);
                                 {{ section.questions_count }}
                             </td>
                             <td class="space-x-2 px-4 py-2 text-right">
-                                <button type="button" class="text-gray-500 hover:text-gray-800" @click="goToQuestions(section)">
+                                <Button variant="ghost" @click="goToQuestions(section)">
                                     {{ t('admin_sections.manage_questions') }}
-                                </button>
-                                <button type="button" class="text-gray-500 hover:text-gray-800" @click="openEdit(section)">
+                                </Button>
+                                <Button variant="ghost" @click="openEdit(section)">
                                     {{ t('admin_sections.edit') }}
-                                </button>
-                                <button type="button" class="text-red-500 hover:text-red-700" @click="remove(section)">
+                                </Button>
+                                <Button variant="ghost-danger" @click="remove(section)">
                                     {{ t('admin_sections.delete') }}
-                                </button>
+                                </Button>
                             </td>
                         </tr>
                     </tbody>
@@ -145,17 +146,12 @@ onMounted(load);
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" class="text-sm text-gray-500" @click="closeForm">
+                    <Button variant="ghost" @click="closeForm">
                         {{ t('admin_sections.cancel') }}
-                    </button>
-                    <button
-                        type="button"
-                        class="rounded bg-gray-800 px-4 py-2 text-sm text-white disabled:opacity-40"
-                        :disabled="saving"
-                        @click="save"
-                    >
+                    </Button>
+                    <Button :disabled="saving" @click="save">
                         {{ t('admin_sections.save') }}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

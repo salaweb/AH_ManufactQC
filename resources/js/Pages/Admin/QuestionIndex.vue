@@ -4,6 +4,7 @@ import { Link } from '@inertiajs/vue3';
 import { VueDraggable } from 'vue-draggable-plus';
 import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
+import Button from '../../Components/Button.vue';
 import { api } from '../../api';
 
 const props = defineProps({
@@ -104,9 +105,9 @@ onMounted(load);
                 <h1 class="text-lg font-semibold text-gray-800">
                     {{ t('admin_questions.title') }} — {{ section?.name }}
                 </h1>
-                <button type="button" class="rounded bg-gray-800 px-4 py-2 text-sm text-white" @click="openCreate">
+                <Button @click="openCreate">
                     {{ t('admin_questions.add') }}
-                </button>
+                </Button>
             </div>
 
             <div class="rounded-lg bg-white shadow">
@@ -128,12 +129,12 @@ onMounted(load);
                         <span class="flex-1 text-sm font-medium">{{ question.text }}</span>
                         <span class="w-36 text-sm text-gray-600">{{ t(`category.${question.category}`) }}</span>
                         <span class="flex w-32 justify-end gap-2">
-                            <button type="button" class="text-sm text-gray-500 hover:text-gray-800" @click="openEdit(question)">
+                            <Button variant="ghost" @click="openEdit(question)">
                                 {{ t('admin_questions.edit') }}
-                            </button>
-                            <button type="button" class="text-sm text-red-500 hover:text-red-700" @click="remove(question)">
+                            </Button>
+                            <Button variant="ghost-danger" @click="remove(question)">
                                 {{ t('admin_questions.delete') }}
-                            </button>
+                            </Button>
                         </span>
                     </div>
                 </VueDraggable>
@@ -165,17 +166,12 @@ onMounted(load);
                 </label>
 
                 <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" class="text-sm text-gray-500" @click="closeForm">
+                    <Button variant="ghost" @click="closeForm">
                         {{ t('admin_questions.cancel') }}
-                    </button>
-                    <button
-                        type="button"
-                        class="rounded bg-gray-800 px-4 py-2 text-sm text-white disabled:opacity-40"
-                        :disabled="saving"
-                        @click="save"
-                    >
+                    </Button>
+                    <Button :disabled="saving" @click="save">
                         {{ t('admin_questions.save') }}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

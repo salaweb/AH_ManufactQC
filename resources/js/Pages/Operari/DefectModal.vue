@@ -1,6 +1,7 @@
 <script setup>
 import { reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
+import Button from '../../Components/Button.vue';
 import { api } from '../../api';
 
 const props = defineProps({
@@ -83,25 +84,15 @@ async function save(keepOpen) {
             </div>
 
             <div class="flex flex-col gap-2 pt-2">
-                <button
-                    type="button"
-                    class="rounded bg-red-600 py-2 text-sm font-medium text-white disabled:opacity-40"
-                    :disabled="saving.value"
-                    @click="save(false)"
-                >
+                <Button variant="danger" class="w-full" :disabled="saving.value" @click="save(false)">
                     {{ t('defect.save') }}
-                </button>
-                <button
-                    type="button"
-                    class="rounded border border-gray-300 py-2 text-sm font-medium text-gray-700 disabled:opacity-40"
-                    :disabled="saving.value"
-                    @click="save(true)"
-                >
+                </Button>
+                <Button variant="outline" class="w-full" :disabled="saving.value" @click="save(true)">
                     {{ t('defect.add_another') }}
-                </button>
-                <button type="button" class="text-sm text-gray-500" @click="emit('close')">
+                </Button>
+                <Button variant="ghost" @click="emit('close')">
                     {{ t('defect.cancel') }}
-                </button>
+                </Button>
             </div>
         </div>
     </div>
