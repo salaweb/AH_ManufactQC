@@ -134,5 +134,24 @@
         "cancel": "Cancel·lar",
         "delete": "Eliminar",
         "delete_confirm": "Segur que vols eliminar aquesta pregunta?"
+    },
+    "admin_users": {
+        "title": "Usuaris",
+        "name": "Nom",
+        "role": "Rol",
+        "role_admin": "Administrador",
+        "role_qc": "Responsable QC",
+        "role_operari": "Operari de Qualitat",
+        "email": "Email",
+        "username": "Nom d'usuari",
+        "password": "Contrasenya",
+        "password_hint": "Deixa-ho en blanc per no canviar-la",
+        "add": "Afegir usuari",
+        "edit": "Editar usuari",
+        "save": "Desa",
+        "cancel": "Cancel·lar",
+        "delete": "Eliminar",
+        "delete_confirm": "Segur que vols eliminar aquest usuari?",
+        "add_failed": "No s'ha pogut afegir"
     }
 }

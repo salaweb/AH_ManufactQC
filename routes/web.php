@@ -38,6 +38,10 @@ Route::get('/admin/sections/{section}/questions', function (Section $section) {
     return Inertia::render('Admin/QuestionIndex', ['sectionId' => $section->id]);
 })->middleware(['auth', EnsureAdminOrQc::class])->name('admin.sections.questions');
 
+Route::get('/admin/users', function () {
+    return Inertia::render('Admin/UserIndex');
+})->middleware(['auth', EnsureAdminOrQc::class])->name('admin.users');
+
 Route::get('/operari', function () {
     return Inertia::render('Operari/ProjectSelector');
 })->middleware(['auth', EnsureOperari::class])->name('operari.home');

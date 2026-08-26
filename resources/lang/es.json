@@ -134,5 +134,24 @@
         "cancel": "Cancelar",
         "delete": "Eliminar",
         "delete_confirm": "¿Seguro que quieres eliminar esta pregunta?"
+    },
+    "admin_users": {
+        "title": "Usuarios",
+        "name": "Nombre",
+        "role": "Rol",
+        "role_admin": "Administrador",
+        "role_qc": "Responsable QC",
+        "role_operari": "Operario de Calidad",
+        "email": "Email",
+        "username": "Nombre de usuario",
+        "password": "Contraseña",
+        "password_hint": "Déjalo en blanco para no cambiarla",
+        "add": "Añadir usuario",
+        "edit": "Editar usuario",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "delete_confirm": "¿Seguro que quieres eliminar este usuario?",
+        "add_failed": "No se ha podido añadir"
     }
 }

@@ -77,6 +77,9 @@ onMounted(() => {
                     <Link href="/admin/sections" class="text-sm text-gray-500 hover:text-gray-700">
                         {{ t('admin_sections.title') }}
                     </Link>
+                    <Link href="/admin/users" class="text-sm text-gray-500 hover:text-gray-700">
+                        {{ t('admin_users.title') }}
+                    </Link>
                     <Button variant="ghost" @click="logout">
                         {{ t('auth.logout') }}
                     </Button>
