@@ -155,5 +155,39 @@
         "delete": "Eliminar",
         "delete_confirm": "¿Seguro que quieres eliminar este usuario?",
         "add_failed": "No se ha podido añadir"
+    },
+    "admin_order_fabrications": {
+        "title": "Órdenes de fabricación",
+        "number": "Número OF",
+        "project": "Proyecto",
+        "equipment_count": "Equipos",
+        "add": "Añadir OF",
+        "edit": "Editar OF",
+        "manage_equipment": "Gestionar equipos",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "delete_confirm": "¿Seguro que quieres eliminar esta OF? También se eliminarán sus equipos."
+    },
+    "admin_equipment": {
+        "title": "Equipos",
+        "serie_number": "Número de serie",
+        "status": "Estado",
+        "observations": "Observaciones",
+        "add": "Añadir equipo",
+        "edit": "Editar equipo",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "delete_confirm": "¿Seguro que quieres eliminar este equipo?",
+        "generate_title": "Generar equipos en serie",
+        "generate_start": "Número de serie inicial",
+        "generate_quantity": "Cantidad",
+        "generate_button": "Generar",
+        "generate_result": "Se han creado {created} de {total} equipos.",
+        "generate_error_hint": "Los números que ya existían no se han creado — edítalos manualmente si hace falta.",
+        "generate_max_hint": "Como máximo {max} equipos de golpe. Si necesitas más, genéralos en varias veces.",
+        "generate_progress": "Generando… {done} de {total}",
+        "generate_stop": "Detener"
     }
 }

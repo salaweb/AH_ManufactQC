@@ -64,6 +64,13 @@ function logout() {
                 {{ t('admin_sections.title') }}
             </Link>
             <Link
+                href="/admin/order-fabrications"
+                class="block rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                @click="open = false"
+            >
+                {{ t('admin_order_fabrications.title') }}
+            </Link>
+            <Link
                 href="/admin/users"
                 class="block rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
                 @click="open = false"

@@ -155,5 +155,39 @@
         "delete": "Eliminar",
         "delete_confirm": "Segur que vols eliminar aquest usuari?",
         "add_failed": "No s'ha pogut afegir"
+    },
+    "admin_order_fabrications": {
+        "title": "Ordres de fabricació",
+        "number": "Número OF",
+        "project": "Projecte",
+        "equipment_count": "Equips",
+        "add": "Afegir OF",
+        "edit": "Editar OF",
+        "manage_equipment": "Gestionar equips",
+        "save": "Desa",
+        "cancel": "Cancel·lar",
+        "delete": "Eliminar",
+        "delete_confirm": "Segur que vols eliminar aquesta OF? També s'eliminaran els seus equips."
+    },
+    "admin_equipment": {
+        "title": "Equips",
+        "serie_number": "Número de sèrie",
+        "status": "Estat",
+        "observations": "Observacions",
+        "add": "Afegir equip",
+        "edit": "Editar equip",
+        "save": "Desa",
+        "cancel": "Cancel·lar",
+        "delete": "Eliminar",
+        "delete_confirm": "Segur que vols eliminar aquest equip?",
+        "generate_title": "Generar equips en sèrie",
+        "generate_start": "Número de sèrie inicial",
+        "generate_quantity": "Quantitat",
+        "generate_button": "Generar",
+        "generate_result": "S'han creat {created} de {total} equips.",
+        "generate_error_hint": "Els números que ja existien no s'han creat — edita'ls manualment si cal.",
+        "generate_max_hint": "Com a màxim {max} equips de cop. Si en necessites més, genera'ls en diversos cops.",
+        "generate_progress": "Generant… {done} de {total}",
+        "generate_stop": "Aturar"
     }
 }

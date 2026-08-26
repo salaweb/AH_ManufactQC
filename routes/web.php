@@ -42,6 +42,14 @@ Route::get('/admin/users', function () {
     return Inertia::render('Admin/UserIndex');
 })->middleware(['auth', EnsureAdminOrQc::class])->name('admin.users');
 
+Route::get('/admin/order-fabrications', function () {
+    return Inertia::render('Admin/OrderFabricationIndex');
+})->middleware(['auth', EnsureAdminOrQc::class])->name('admin.order-fabrications');
+
+Route::get('/admin/order-fabrications/{orderFabrication}/equipment', function (OrderFabrication $orderFabrication) {
+    return Inertia::render('Admin/EquipmentIndex', ['orderFabricationId' => $orderFabrication->id]);
+})->middleware(['auth', EnsureAdminOrQc::class])->name('admin.order-fabrications.equipment');
+
 Route::get('/operari', function () {
     return Inertia::render('Operari/ProjectSelector');
 })->middleware(['auth', EnsureOperari::class])->name('operari.home');
