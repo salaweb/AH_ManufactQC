@@ -56,7 +56,10 @@
         "type_funcional": "Funcional",
         "responsibility_produccio": "Producció",
         "responsibility_proveidor": "Proveïdor",
-        "responsibility_disseny": "Disseny"
+        "responsibility_disseny": "Disseny",
+        "responsible_user": "Operari de producció responsable",
+        "responsible_user_placeholder": "Selecciona un operari...",
+        "error": "No s'ha pogut desar el defecte"
     },
     "photos": {
         "title": "Vols fer fotos?",
@@ -154,6 +157,7 @@
         "role_admin": "Administrador",
         "role_qc": "Responsable QC",
         "role_operari": "Operari de Qualitat",
+        "role_operari_produccio": "Operari de Producció",
         "email": "Email",
         "username": "Nom d'usuari",
         "password": "Contrasenya",

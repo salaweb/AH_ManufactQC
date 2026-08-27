@@ -104,6 +104,58 @@ it('does not affect the live (not-yet-finished) status when a defect is created 
     expect($equipment->fresh()->status)->toBe(EquipmentStatus::Pending);
 });
 
+it('links a defect to a production operator when responsibility is produccio', function () {
+    $equipment = Equipment::factory()->create();
+    $operator = User::factory()->operariProduccio()->create();
+
+    $response = $this->postJson('/operari/api/defects', [
+        'equipment_id' => $equipment->id,
+        'tipo' => 'visual',
+        'responsibility' => 'produccio',
+        'responsible_user_id' => $operator->id,
+    ]);
+
+    $response->assertCreated();
+    expect(Defect::first()->responsible_user_id)->toBe($operator->id);
+});
+
+it('rejects a produccio defect without a responsible operator', function () {
+    $equipment = Equipment::factory()->create();
+
+    $response = $this->postJson('/operari/api/defects', [
+        'equipment_id' => $equipment->id,
+        'tipo' => 'visual',
+        'responsibility' => 'produccio',
+    ]);
+
+    $response->assertUnprocessable()->assertJsonValidationErrors('responsible_user_id');
+});
+
+it('rejects a responsible_user_id that does not belong to an operari_produccio user', function () {
+    $equipment = Equipment::factory()->create();
+    $notAnOperator = User::factory()->operari()->create();
+
+    $response = $this->postJson('/operari/api/defects', [
+        'equipment_id' => $equipment->id,
+        'tipo' => 'visual',
+        'responsibility' => 'produccio',
+        'responsible_user_id' => $notAnOperator->id,
+    ]);
+
+    $response->assertUnprocessable()->assertJsonValidationErrors('responsible_user_id');
+});
+
+it('lists production operators for the responsible-user dropdown', function () {
+    User::factory()->operariProduccio()->create(['name' => 'Joan']);
+    User::factory()->operari()->create(['name' => 'Maria']);
+
+    $response = $this->getJson('/operari/api/production-operators');
+
+    $response->assertOk();
+    expect($response->json())->toHaveCount(1)
+        ->and($response->json()[0]['name'])->toBe('Joan');
+});
+
 it('deleting a defect does not change the live status while its answer is still marked defect', function () {
     $equipment = Equipment::factory()->create();
     $answer = Answer::factory()->create(['equipment_id' => $equipment->id, 'response' => 'defect']);

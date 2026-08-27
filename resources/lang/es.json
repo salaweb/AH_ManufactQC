@@ -56,7 +56,10 @@
         "type_funcional": "Funcional",
         "responsibility_produccio": "Producción",
         "responsibility_proveidor": "Proveedor",
-        "responsibility_disseny": "Diseño"
+        "responsibility_disseny": "Diseño",
+        "responsible_user": "Operario de producción responsable",
+        "responsible_user_placeholder": "Selecciona un operario...",
+        "error": "No se ha podido guardar el defecto"
     },
     "photos": {
         "title": "¿Quieres hacer fotos?",
@@ -154,6 +157,7 @@
         "role_admin": "Administrador",
         "role_qc": "Responsable QC",
         "role_operari": "Operario de Calidad",
+        "role_operari_produccio": "Operario de Producción",
         "email": "Email",
         "username": "Nombre de usuario",
         "password": "Contraseña",

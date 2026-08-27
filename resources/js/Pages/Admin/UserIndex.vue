@@ -8,7 +8,7 @@ import { api } from '../../api';
 
 const { t } = useI18n();
 
-const roles = ['admin', 'qc', 'operari'];
+const roles = ['admin', 'qc', 'operari', 'operari_produccio'];
 
 const users = ref([]);
 const formOpen = ref(false);
@@ -23,7 +23,7 @@ function blankForm() {
 const form = reactive(blankForm());
 
 const showEmail = computed(() => form.role === 'admin' || form.role === 'qc');
-const showUsername = computed(() => form.role === 'operari');
+const showUsername = computed(() => form.role === 'operari' || form.role === 'operari_produccio');
 
 async function load() {
     users.value = await api.get('/api/users');

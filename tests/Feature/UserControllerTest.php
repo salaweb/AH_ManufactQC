@@ -70,6 +70,30 @@ it('updates a user without changing the password when none is given', function (
         ->and($user->fresh()->password)->toBe($originalHash);
 });
 
+it('creates an operari_produccio user with a username', function () {
+    $response = $this->postJson('/api/users', [
+        'name' => 'Nou Operari Producció',
+        'role' => 'operari_produccio',
+        'username' => 'nou_operari_produccio',
+        'password' => 'password123',
+    ]);
+
+    $response->assertCreated();
+    $user = User::where('username', 'nou_operari_produccio')->firstOrFail();
+    expect($user->role)->toBe(UserRole::OperariProduccio)
+        ->and($user->email)->toBeNull();
+});
+
+it('rejects creating an operari_produccio without a username', function () {
+    $response = $this->postJson('/api/users', [
+        'name' => 'Sense Username',
+        'role' => 'operari_produccio',
+        'password' => 'password123',
+    ]);
+
+    $response->assertUnprocessable()->assertJsonValidationErrors('username');
+});
+
 it('deletes a user', function () {
     $user = User::factory()->operari()->create();
 

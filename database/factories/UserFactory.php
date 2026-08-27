@@ -77,4 +77,16 @@ class UserFactory extends Factory
             'role' => UserRole::Operari,
         ]);
     }
+
+    /**
+     * Production operator, not authenticated anywhere yet — only linked to defects.
+     */
+    public function operariProduccio(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email' => null,
+            'username' => fake()->unique()->userName(),
+            'role' => UserRole::OperariProduccio,
+        ]);
+    }
 }

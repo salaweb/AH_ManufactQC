@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, watch } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Button from '../../Components/Button.vue';
 import { api } from '../../api';
@@ -23,19 +23,24 @@ function blankForm() {
         tipo: types[0],
         observation: '',
         responsibility: responsibilities[0],
+        responsible_user_id: null,
         actions: '',
     };
 }
 
 const form = reactive(blankForm());
 const saving = reactive({ value: false });
+const error = ref('');
+const productionOperators = ref([]);
 
 watch(
     () => props.open,
-    (isOpen) => {
+    async (isOpen) => {
         if (!isOpen) {
             return;
         }
+
+        error.value = '';
 
         Object.assign(
             form,
@@ -44,15 +49,28 @@ watch(
                       tipo: props.editingDefect.tipo,
                       observation: props.editingDefect.observation ?? '',
                       responsibility: props.editingDefect.responsibility ?? responsibilities[0],
+                      responsible_user_id: props.editingDefect.responsible_user_id ?? null,
                       actions: props.editingDefect.actions ?? '',
                   }
                 : blankForm(),
         );
+
+        productionOperators.value = await api.get('/operari/api/production-operators');
+    },
+);
+
+watch(
+    () => form.responsibility,
+    (value) => {
+        if (value !== 'produccio') {
+            form.responsible_user_id = null;
+        }
     },
 );
 
 async function save(keepOpen) {
     saving.value = true;
+    error.value = '';
 
     try {
         const defect = props.editingDefect
@@ -70,6 +88,8 @@ async function save(keepOpen) {
         } else {
             emit('close');
         }
+    } catch (err) {
+        error.value = err.data?.errors?.responsible_user_id?.[0] ?? err.data?.message ?? t('defect.error');
     } finally {
         saving.value = false;
     }
@@ -104,10 +124,22 @@ async function save(keepOpen) {
                 </select>
             </div>
 
+            <div v-if="form.responsibility === 'produccio'">
+                <label class="mb-1 block text-sm font-medium text-gray-700">{{ t('defect.responsible_user') }}</label>
+                <select v-model="form.responsible_user_id" class="w-full rounded border border-gray-300 px-3 py-2">
+                    <option :value="null" disabled>{{ t('defect.responsible_user_placeholder') }}</option>
+                    <option v-for="operator in productionOperators" :key="operator.id" :value="operator.id">
+                        {{ operator.name }}
+                    </option>
+                </select>
+            </div>
+
             <div>
                 <label class="mb-1 block text-sm font-medium text-gray-700">{{ t('defect.actions') }}</label>
                 <textarea v-model="form.actions" class="w-full rounded border border-gray-300 px-3 py-2" rows="2" />
             </div>
+
+            <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
 
             <div class="flex flex-col gap-2 pt-2">
                 <Button variant="danger" class="w-full" :disabled="saving.value" @click="save(false)">

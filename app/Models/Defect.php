@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['equipment_id', 'answer_id', 'tipo', 'observation', 'responsibility', 'actions'])]
+#[Fillable(['equipment_id', 'answer_id', 'tipo', 'observation', 'responsibility', 'responsible_user_id', 'actions'])]
 class Defect extends Model
 {
     /** @use HasFactory<DefectFactory> */
@@ -22,5 +22,10 @@ class Defect extends Model
     public function answer(): BelongsTo
     {
         return $this->belongsTo(Answer::class);
+    }
+
+    public function responsibleUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'responsible_user_id');
     }
 }

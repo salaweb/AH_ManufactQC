@@ -32,7 +32,7 @@ class StoreUserRequest extends FormRequest
                 'nullable', 'email', Rule::unique('users', 'email'),
             ],
             'username' => [
-                Rule::requiredIf($this->input('role') === 'operari'),
+                Rule::requiredIf(in_array($this->input('role'), ['operari', 'operari_produccio'], true)),
                 'nullable', 'string', Rule::unique('users', 'username'),
             ],
             'password' => ['required', 'string', 'min:8'],

@@ -21,7 +21,7 @@ class UserController extends Controller
     {
         $data = $request->validated();
 
-        if ($data['role'] === UserRole::Operari->value) {
+        if (in_array($data['role'], [UserRole::Operari->value, UserRole::OperariProduccio->value], true)) {
             $data['email'] = null;
         } else {
             $data['username'] = null;
@@ -45,7 +45,7 @@ class UserController extends Controller
             unset($data['password']);
         }
 
-        if ($data['role'] === UserRole::Operari->value) {
+        if (in_array($data['role'], [UserRole::Operari->value, UserRole::OperariProduccio->value], true)) {
             $data['email'] = null;
         } else {
             $data['username'] = null;

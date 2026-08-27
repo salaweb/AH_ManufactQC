@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\UserRole;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateDefectRequest extends FormRequest
 {
@@ -26,6 +28,11 @@ class UpdateDefectRequest extends FormRequest
             'tipo' => ['required', 'string'],
             'observation' => ['nullable', 'string'],
             'responsibility' => ['nullable', 'string'],
+            'responsible_user_id' => [
+                Rule::requiredIf($this->input('responsibility') === 'produccio'),
+                'nullable', 'integer',
+                Rule::exists('users', 'id')->where('role', UserRole::OperariProduccio->value),
+            ],
             'actions' => ['nullable', 'string'],
         ];
     }
