@@ -26,7 +26,7 @@ class EquipmentController extends Controller
     {
         $equipment->load(['project.sections', 'orderFabrication', 'defects', 'photos']);
 
-        $answers = $equipment->answers()->with('defects')->get()->keyBy('question_id');
+        $answers = $equipment->answers()->with('defects.responsibleUser')->get()->keyBy('question_id');
 
         $sections = $equipment->project->sections()
             ->with(['questions' => fn ($query) => $query->orderBy('order')])

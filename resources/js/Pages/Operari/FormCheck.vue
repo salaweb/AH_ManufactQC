@@ -215,6 +215,9 @@ onMounted(load);
                                 <p v-if="defect.responsibility" class="text-gray-500">
                                     {{ t('defect.responsibility') }}: {{ t(`defect.responsibility_${defect.responsibility}`) }}
                                 </p>
+                                <p v-if="defect.responsible_user" class="text-gray-500">
+                                    {{ t('defect.responsible_user') }}: {{ defect.responsible_user.name }}
+                                </p>
                                 <p v-if="defect.actions" class="font-medium text-green-700">
                                     {{ t('defect.actions') }}: {{ defect.actions }}
                                 </p>

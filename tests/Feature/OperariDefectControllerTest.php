@@ -119,6 +119,21 @@ it('links a defect to a production operator when responsibility is produccio', f
     expect(Defect::first()->responsible_user_id)->toBe($operator->id);
 });
 
+it('returns the responsible operator\'s name in the response right after saving', function () {
+    $equipment = Equipment::factory()->create();
+    $operator = User::factory()->operariProduccio()->create(['name' => 'Joan']);
+
+    $response = $this->postJson('/operari/api/defects', [
+        'equipment_id' => $equipment->id,
+        'tipo' => 'visual',
+        'responsibility' => 'produccio',
+        'responsible_user_id' => $operator->id,
+    ]);
+
+    $response->assertCreated();
+    expect($response->json('responsible_user.name'))->toBe('Joan');
+});
+
 it('rejects a produccio defect without a responsible operator', function () {
     $equipment = Equipment::factory()->create();
 

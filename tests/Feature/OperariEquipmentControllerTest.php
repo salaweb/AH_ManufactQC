@@ -85,6 +85,32 @@ it('includes the answer id and its recorded defects, so a re-opened defect quest
         ->and($questionPayload['answer']['defects'][0]['actions'])->toBe('Substituir la peça');
 });
 
+it('includes the responsible production operator\'s name alongside a recorded defect', function () {
+    $equipment = Equipment::factory()->create();
+    $section = Section::factory()->create(['order' => 1]);
+    $equipment->project->sections()->attach($section);
+    $question = Question::factory()->create(['section_id' => $section->id, 'order' => 1]);
+    $answer = Answer::factory()->create([
+        'equipment_id' => $equipment->id,
+        'question_id' => $question->id,
+        'response' => AnswerResponse::Defect,
+    ]);
+    $operator = \App\Models\User::factory()->operariProduccio()->create(['name' => 'Joan']);
+    Defect::factory()->create([
+        'equipment_id' => $equipment->id,
+        'answer_id' => $answer->id,
+        'responsibility' => 'produccio',
+        'responsible_user_id' => $operator->id,
+    ]);
+
+    $response = $this->getJson("/operari/api/equipment/{$equipment->id}");
+
+    $response->assertOk();
+    $defectPayload = $response->json('sections.0.questions.0.answer.defects.0');
+
+    expect($defectPayload['responsible_user']['name'])->toBe('Joan');
+});
+
 it('only shows sections assigned to the equipment\'s project, not every section in the system', function () {
     $equipment = Equipment::factory()->create();
     $assignedSection = Section::factory()->create(['name' => 'ASSIGNED']);

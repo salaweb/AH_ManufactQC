@@ -18,14 +18,14 @@ class DefectController extends Controller
 
         Equipment::find($defect->equipment_id)->refreshStatus();
 
-        return response()->json($defect, 201);
+        return response()->json($defect->load('responsibleUser'), 201);
     }
 
     public function update(UpdateDefectRequest $request, Defect $defect): JsonResponse
     {
         $defect->update($request->validated());
 
-        return response()->json($defect);
+        return response()->json($defect->load('responsibleUser'));
     }
 
     public function destroy(Defect $defect): Response
