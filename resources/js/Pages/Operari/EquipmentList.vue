@@ -17,6 +17,7 @@ const equipment = ref([]);
 
 const statusClasses = {
     pending: 'bg-gray-200 text-gray-700',
+    missing_answers: 'bg-amber-100 text-amber-800',
     pending_defect: 'bg-red-100 text-red-800',
     ok: 'bg-green-100 text-green-800',
     defect: 'bg-emerald-100 text-emerald-800',

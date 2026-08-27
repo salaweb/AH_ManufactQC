@@ -15,6 +15,10 @@ use Illuminate\Testing\TestResponse;
  * - While NOT finished, "amb defectes" tracks the LIVE state — only questions
  *   *currently* answered "defect" count, so the badge updates the moment a
  *   question is answered differently (Pendent <-> Pendent amb defectes).
+ * - "Falten respostes" (MissingAnswers) distinguishes "started, then left
+ *   mid-way" (at least one saved answer, but not every required question
+ *   answered, no current defect) from a truly untouched "Pendent" (zero
+ *   answers at all). A current defect answer still takes priority over this.
  * - Finalizing is blocked outright while ANY question currently reads "defect"
  *   (vermell), even if that defect is already fully documented — a defect must
  *   be resolved (answered yes/no) before the review can be finished.
@@ -83,20 +87,44 @@ it('stays pending while answering non-defect questions, even once every required
         ->and($this->equipment->fresh()->checked_at)->toBeNull();
 });
 
+it('becomes missing-answers once at least one question is answered but the review is left incomplete', function () {
+    postEquipmentAnswer($this, $this->questionA, 'yes');
+
+    expect($this->equipment->fresh()->status)->toBe(EquipmentStatus::MissingAnswers);
+});
+
+it('reverts from missing-answers back to pending when the only answer is deleted', function () {
+    postEquipmentAnswer($this, $this->questionA, 'yes');
+    expect($this->equipment->fresh()->status)->toBe(EquipmentStatus::MissingAnswers);
+
+    $answerId = equipmentAnswerId($this, $this->questionA);
+    $this->deleteJson("/operari/api/answers/{$answerId}")->assertNoContent();
+
+    expect($this->equipment->fresh()->status)->toBe(EquipmentStatus::Pending);
+});
+
+it('prioritizes pending-with-defects over missing-answers when both apply', function () {
+    postEquipmentAnswer($this, $this->questionA, 'defect');
+
+    // questionB is still unanswered too, but the defect badge takes priority.
+    expect($this->equipment->fresh()->status)->toBe(EquipmentStatus::PendingWithDefects);
+});
+
 it('becomes pending-with-defects the moment a question is answered defect, even before a defect record is saved', function () {
     postEquipmentAnswer($this, $this->questionA, 'defect');
 
     expect($this->equipment->fresh()->status)->toBe(EquipmentStatus::PendingWithDefects);
 });
 
-it('reverts to pending the moment the defect answer changes to yes, regardless of whether its defect record still exists', function () {
+it('reverts to missing-answers the moment the defect answer changes to yes, regardless of whether its defect record still exists', function () {
     postEquipmentAnswer($this, $this->questionA, 'defect');
     postEquipmentDefect($this, $this->questionA);
     expect($this->equipment->fresh()->status)->toBe(EquipmentStatus::PendingWithDefects);
 
     postEquipmentAnswer($this, $this->questionA, 'yes');
 
-    expect($this->equipment->fresh()->status)->toBe(EquipmentStatus::Pending);
+    // questionB is still unanswered, so this is "started but incomplete", not untouched.
+    expect($this->equipment->fresh()->status)->toBe(EquipmentStatus::MissingAnswers);
 });
 
 it('stays pending-with-defects when the defect record is deleted but its answer is still marked defect', function () {
@@ -198,7 +226,7 @@ it('still finalizes as ok-with-defects even if the defect answer was flipped bac
 
 // --- After finishing: historical, defect-record-driven ---
 
-it('reverts an ok equipment back to pending when one of its answers is deleted', function () {
+it('reverts an ok equipment back to missing-answers when one of its answers is deleted, leaving the other saved', function () {
     postEquipmentAnswer($this, $this->questionA, 'yes');
     postEquipmentAnswer($this, $this->questionB, 'no');
     finalizeEquipmentReview($this)->assertOk();
@@ -207,11 +235,12 @@ it('reverts an ok equipment back to pending when one of its answers is deleted',
     $answerId = equipmentAnswerId($this, $this->questionA);
     $this->deleteJson("/operari/api/answers/{$answerId}")->assertNoContent();
 
-    expect($this->equipment->fresh()->status)->toBe(EquipmentStatus::Pending)
+    // questionB is still answered, so this is "started but incomplete", not untouched.
+    expect($this->equipment->fresh()->status)->toBe(EquipmentStatus::MissingAnswers)
         ->and($this->equipment->fresh()->checked_at)->toBeNull();
 });
 
-it('reverts an ok-with-defects equipment back to pending-with-defects when a non-defect answer is deleted', function () {
+it('reverts an ok-with-defects equipment back to missing-answers when a non-defect answer is deleted', function () {
     postEquipmentAnswer($this, $this->questionA, 'defect');
     postEquipmentDefect($this, $this->questionA);
     postEquipmentAnswer($this, $this->questionA, 'yes'); // resolved before finalizing, as required
@@ -223,8 +252,9 @@ it('reverts an ok-with-defects equipment back to pending-with-defects when a non
     $this->deleteJson("/operari/api/answers/{$answerIdB}")->assertNoContent();
 
     // No longer finished (questionB unanswered again), so we're back to the live rule:
-    // questionA currently says "yes", so no live defect right now either.
-    expect($this->equipment->fresh()->status)->toBe(EquipmentStatus::Pending)
+    // questionA currently says "yes" (no live defect), but questionB is now missing,
+    // and questionA is still answered, so this reads "started but incomplete".
+    expect($this->equipment->fresh()->status)->toBe(EquipmentStatus::MissingAnswers)
         ->and($this->equipment->fresh()->checked_at)->toBeNull();
 });
 

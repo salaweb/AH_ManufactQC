@@ -60,10 +60,19 @@ class Equipment extends Model
 
         // While still being reviewed, "amb defectes" tracks the live state: only
         // questions *currently* answered "defect" count, so the badge updates the
-        // moment a question is answered differently.
-        $hasCurrentDefectAnswer = $this->answers()->where('response', 'defect')->exists();
+        // moment a question is answered differently. A current defect answer always
+        // takes priority over reporting merely-incomplete answers.
+        if ($this->hasCurrentDefectAnswer()) {
+            return EquipmentStatus::PendingWithDefects;
+        }
 
-        return $hasCurrentDefectAnswer ? EquipmentStatus::PendingWithDefects : EquipmentStatus::Pending;
+        // Some answers were saved but the review hasn't been left fully answered —
+        // distinguishes "started, then left mid-way" from "never touched".
+        if (! $this->isFullyAnswered() && $this->answers()->exists()) {
+            return EquipmentStatus::MissingAnswers;
+        }
+
+        return EquipmentStatus::Pending;
     }
 
     public function isFullyAnswered(): bool

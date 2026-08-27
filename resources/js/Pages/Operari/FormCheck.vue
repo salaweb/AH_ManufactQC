@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
-import { Link, router } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import LanguageSelector from '../../Components/LanguageSelector.vue';
 import OperariNav from '../../Components/OperariNav.vue';
@@ -150,6 +150,10 @@ function openFinish() {
     photosModal.open = true;
 }
 
+function exitWithoutFinishing() {
+    router.visit(`/operari/order-fabrications/${equipment.value.order_fabrication_id}/equipment-list`);
+}
+
 function onFinished() {
     router.visit(`/operari/order-fabrications/${equipment.value.order_fabrication_id}/equipment-list`);
 }
@@ -239,12 +243,9 @@ onMounted(load);
             <Button class="w-full" :disabled="pendingMutations > 0" @click="openFinish">
                 {{ t('form.finish') }}
             </Button>
-            <Link
-                :href="`/operari/order-fabrications/${equipment.order_fabrication_id}/equipment-list`"
-                class="block text-center text-sm text-gray-500 hover:text-gray-700"
-            >
-                ← {{ t('common.back') }}
-            </Link>
+            <Button class="w-full" variant="outline" @click="exitWithoutFinishing">
+                {{ t('form.exit_without_finishing') }}
+            </Button>
         </div>
     </div>
 
