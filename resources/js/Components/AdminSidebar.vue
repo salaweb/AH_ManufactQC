@@ -99,6 +99,14 @@ function logout() {
                 </button>
             </div>
 
+            <Link
+                href="/operari"
+                class="block rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                @click="open = false"
+            >
+                {{ t('operari.login_title') }}
+            </Link>
+
             <button
                 type="button"
                 class="block w-full rounded px-3 py-2 text-left text-sm text-gray-500 transition duration-100 ease-out hover:bg-gray-50 hover:text-gray-700 active:scale-[0.98]"

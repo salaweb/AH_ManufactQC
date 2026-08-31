@@ -27,10 +27,10 @@ it('searches order fabrications by partial number, with the project, its family,
         ->and($response->json('0.equipment_count'))->toBe(4);
 });
 
-it('blocks an admin from the operari order fabrication search', function () {
+it('lets an admin access the operari order fabrication search directly', function () {
     $admin = User::factory()->admin()->create();
 
     $response = $this->actingAs($admin)->getJson('/operari/api/order-fabrications');
 
-    $response->assertForbidden();
+    $response->assertOk();
 });

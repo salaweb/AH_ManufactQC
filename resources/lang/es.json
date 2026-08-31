@@ -6,17 +6,18 @@
     "common": {
         "back": "Atrás",
         "menu": "Menú",
-        "close": "Cerrar"
+        "close": "Cerrar",
+        "back_to_admin": "Volver a Administración"
     },
     "auth": {
-        "admin_login_title": "Acceso Administración / QC",
+        "admin_login_title": "Admin / QC",
         "email": "Correo electrónico",
         "password": "Contraseña",
         "submit": "Entrar",
         "logout": "Cerrar sesión"
     },
     "operari": {
-        "login_title": "Acceso Operario",
+        "login_title": "Acceso Calidad",
         "username": "Usuario"
     },
     "selector": {

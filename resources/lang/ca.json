@@ -6,17 +6,18 @@
     "common": {
         "back": "Enrere",
         "menu": "Menú",
-        "close": "Tancar"
+        "close": "Tancar",
+        "back_to_admin": "Tornar a Administració"
     },
     "auth": {
-        "admin_login_title": "Accés Administració / QC",
+        "admin_login_title": "Admin / QC",
         "email": "Correu electrònic",
         "password": "Contrasenya",
         "submit": "Entrar",
         "logout": "Tancar sessió"
     },
     "operari": {
-        "login_title": "Accés Operari",
+        "login_title": "Accés Qualitat",
         "username": "Usuari"
     },
     "selector": {

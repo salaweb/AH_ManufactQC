@@ -18,7 +18,7 @@ class EnsureOperari
     {
         $user = $request->user();
 
-        if (! $user || $user->role !== UserRole::Operari) {
+        if (! $user || ! in_array($user->role, [UserRole::Operari, UserRole::Admin, UserRole::Qc], true)) {
             abort(403);
         }
 
