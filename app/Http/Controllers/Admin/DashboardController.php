@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\AnswerResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Answer;
 use App\Models\Defect;
@@ -77,23 +76,31 @@ class DashboardController extends Controller
 
     private function getTrends(Collection $checkedIds): Collection
     {
+        $defectEquipmentCountsBySection = Defect::whereIn('defects.equipment_id', $checkedIds)
+            ->whereNotNull('defects.answer_id')
+            ->join('answers', 'defects.answer_id', '=', 'answers.id')
+            ->join('questions', 'answers.question_id', '=', 'questions.id')
+            ->selectRaw('questions.section_id, count(distinct defects.equipment_id) as count')
+            ->groupBy('questions.section_id')
+            ->pluck('count', 'section_id');
+
         return Section::query()
             ->orderBy('order')
             ->get()
-            ->map(function (Section $section) use ($checkedIds) {
+            ->map(function (Section $section) use ($checkedIds, $defectEquipmentCountsBySection) {
                 $questionIds = $section->questions()->pluck('id');
 
-                $totalAnswers = Answer::whereIn('equipment_id', $checkedIds)->whereIn('question_id', $questionIds)->count();
-                $defectAnswers = Answer::whereIn('equipment_id', $checkedIds)
+                $totalEquipment = Answer::whereIn('equipment_id', $checkedIds)
                     ->whereIn('question_id', $questionIds)
-                    ->where('response', AnswerResponse::Defect)
-                    ->count();
+                    ->distinct('equipment_id')
+                    ->count('equipment_id');
+                $defectEquipment = $defectEquipmentCountsBySection->get($section->id, 0);
 
                 return [
                     'section' => $section->name,
-                    'total_answers' => $totalAnswers,
-                    'defect_answers' => $defectAnswers,
-                    'defect_rate' => $totalAnswers > 0 ? (int) round($defectAnswers / $totalAnswers * 100) : 0,
+                    'total_equipment' => $totalEquipment,
+                    'defect_equipment' => $defectEquipment,
+                    'defect_rate' => $totalEquipment > 0 ? (int) round($defectEquipment / $totalEquipment * 100) : 0,
                 ];
             });
     }

@@ -27,7 +27,7 @@ function dashboardResponse() {
         },
         defects_by_type: [{ tipo: 'visual', count: 2 }],
         responsibilities: [{ responsibility: 'producció', count: 2 }],
-        trends: [{ section: 'QUALITAT', total_answers: 10, defect_answers: 3, defect_rate: 30 }],
+        trends: [{ section: 'QUALITAT', total_equipment: 10, defect_equipment: 3, defect_rate: 30 }],
         recent_photos: [],
     };
 }

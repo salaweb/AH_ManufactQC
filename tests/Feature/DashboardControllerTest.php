@@ -60,21 +60,57 @@ it('groups defects by responsibility', function () {
         ->and($byResponsibility['disseny']['count'])->toBe(1);
 });
 
-it('computes defect rate trends per section', function () {
+it('computes defect rate trends as a percentage of equipment reviewed, not of individual answers', function () {
+    // Un equip finalitzat mai pot tenir una resposta actual "defect" (l'app ho bloqueja),
+    // però pot tenir un Defect registrat com a historial sobre una pregunta ja marcada Sí/No.
+    // 10 equips revisats amb aquesta secció de 3 preguntes, 1 equip amb un defecte -> 10%,
+    // no 1 de 30 respostes (3%).
     $section = Section::factory()->create();
-    $question = Question::factory()->create(['section_id' => $section->id]);
-    $equipmentA = Equipment::factory()->create(['checked_at' => now()]);
-    $equipmentB = Equipment::factory()->create(['checked_at' => now()]);
-    Answer::factory()->create(['equipment_id' => $equipmentA->id, 'question_id' => $question->id, 'response' => AnswerResponse::Defect]);
-    Answer::factory()->create(['equipment_id' => $equipmentB->id, 'question_id' => $question->id, 'response' => AnswerResponse::Yes]);
+    $questions = Question::factory()->count(3)->create(['section_id' => $section->id]);
+
+    $defectiveEquipment = Equipment::factory()->create(['checked_at' => now()]);
+    $defectiveAnswer = Answer::factory()->create([
+        'equipment_id' => $defectiveEquipment->id,
+        'question_id' => $questions->first()->id,
+        'response' => AnswerResponse::Yes,
+    ]);
+    Defect::factory()->create(['equipment_id' => $defectiveEquipment->id, 'answer_id' => $defectiveAnswer->id]);
+    foreach ($questions->skip(1) as $question) {
+        Answer::factory()->create(['equipment_id' => $defectiveEquipment->id, 'question_id' => $question->id, 'response' => AnswerResponse::Yes]);
+    }
+
+    Equipment::factory()->count(9)->create(['checked_at' => now()])->each(function (Equipment $equipment) use ($questions) {
+        foreach ($questions as $question) {
+            Answer::factory()->create(['equipment_id' => $equipment->id, 'question_id' => $question->id, 'response' => AnswerResponse::Yes]);
+        }
+    });
 
     $response = $this->getJson('/api/dashboard');
 
     $trend = collect($response->json('trends'))->firstWhere('section', $section->name);
 
-    expect($trend['total_answers'])->toBe(2)
-        ->and($trend['defect_answers'])->toBe(1)
-        ->and($trend['defect_rate'])->toBe(50);
+    expect($trend['total_equipment'])->toBe(10)
+        ->and($trend['defect_equipment'])->toBe(1)
+        ->and($trend['defect_rate'])->toBe(10);
+});
+
+it('does not double-count an equipment that has defects on more than one question of the same section', function () {
+    $section = Section::factory()->create();
+    $questions = Question::factory()->count(2)->create(['section_id' => $section->id]);
+    $equipment = Equipment::factory()->create(['checked_at' => now()]);
+
+    foreach ($questions as $question) {
+        $answer = Answer::factory()->create(['equipment_id' => $equipment->id, 'question_id' => $question->id, 'response' => AnswerResponse::No]);
+        Defect::factory()->create(['equipment_id' => $equipment->id, 'answer_id' => $answer->id]);
+    }
+
+    $response = $this->getJson('/api/dashboard');
+
+    $trend = collect($response->json('trends'))->firstWhere('section', $section->name);
+
+    expect($trend['total_equipment'])->toBe(1)
+        ->and($trend['defect_equipment'])->toBe(1)
+        ->and($trend['defect_rate'])->toBe(100);
 });
 
 it('returns recent photos for checked equipment only', function () {
